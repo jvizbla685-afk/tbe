@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 5. Aparato cardiovascular. Constantes vitales y balance hídrico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: hoja de examen en una columna; cabecera fija con progreso; resultados al final */
+:root{
+  --bg:#f3f6f7; --paper:#ffffff; --ink:#15262e; --muted:#5a6d75; --line:#d5dfe2;
+  --accent:#0d6e66; --accent-soft:#dcefec;
+  --ok:#1d7a3a; --ok-soft:#e3f3e7; --bad:#b4332d; --bad-soft:#fbe6e4; --blank:#8a6a12; --blank-soft:#fbf2d9;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top-in .t{font:700 15px/1.2 var(--display);flex:1 1 200px;min-width:0}
+.counter{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex:1 1 100%}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.intro{padding-block:36px 8px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(30px,6vw,44px)/1.08 var(--display);margin:.25em 0 .35em;text-wrap:balance}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;padding:0;list-style:none;font-size:15px}
+.meta b{font-family:var(--mono);font-weight:500}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0 8px;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.controls .lbl{font-weight:700;font-size:15px;margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--paper)}
+.controls .hint{flex:1 1 100%;font-size:14px;color:var(--muted);margin:0}
+.block-h{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+.block-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;margin-bottom:16px;scroll-margin-top:90px}
+.q-num{font:500 13px var(--mono);color:var(--accent)}
+.q-text{font-weight:600;margin:6px 0 14px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:500 13px var(--mono)}
+.opt .tx{min-width:0}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .k{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:var(--paper);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.q-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.linkbtn{background:none;border:0;color:var(--muted);font:600 14px var(--body);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15.5px}
+.fb.ok{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)} .fb.blank{background:var(--blank-soft)}
+.fb .v{font-weight:700;display:block;margin-bottom:4px}
+.fb.ok .v{color:var(--ok)} .fb.bad .v{color:var(--bad)} .fb.blank .v{color:var(--blank)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
+.btn{font:700 16px var(--body);border-radius:8px;padding:12px 20px;cursor:pointer;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#results{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px 20px;margin-top:8px;scroll-margin-top:80px}
+#results h2{font:700 26px/1.15 var(--display);margin:0 0 4px}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin:12px 0 18px}
+.score .n{font:700 64px/1 var(--display);font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted);font-family:var(--mono);font-size:15px}
+.pill{display:inline-block;font:700 13px var(--body);padding:4px 10px;border-radius:999px}
+.pill.pass{background:var(--ok-soft);color:var(--ok)} .pill.fail{background:var(--bad-soft);color:var(--bad)}
+.tally{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.tally div{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tally span{display:block;font-size:13px;color:var(--muted)}
+.tally b{font:500 22px var(--mono);font-variant-numeric:tabular-nums}
+.formula{font-family:var(--mono);font-size:14px;background:var(--bg);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini{height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:70px}
+.mini i{display:block;height:100%;background:var(--accent)}
+.tips{margin:20px 0 0;padding-left:20px}
+.tips li{margin-bottom:6px}
+h3{font:700 18px var(--display);margin:24px 0 8px}
+.note{font-size:14px;color:var(--muted);margin-top:16px}
+footer{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
+@media (max-width:480px){.q{padding:16px 14px}.tally{grid-template-columns:1fr 1fr 1fr}.score .n{font-size:52px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <span class="t">Tema 5 · 30 preguntas</span>
+  <span class="counter" id="counter">0/30 respondidas</span>
+  <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">Pruebas libres · Técnico en Cuidados Auxiliares de Enfermería</div>
+    <h1>Tema 5. Aparato cardiovascular. Constantes vitales y balance hídrico</h1>
+    <p class="lead">Simulacro tipo test con casos prácticos y preguntas trampa. Elige una respuesta en cada pregunta. Puedes dejar preguntas en blanco: no suman ni restan.</p>
+    <ul class="meta">
+      <li><b>30</b> preguntas</li>
+      <li><b>4</b> opciones, una correcta</li>
+      <li>Tiempo orientativo: <b>45 min</b></li>
+    </ul>
+  </section>
+
+  <div class="controls" role="group" aria-label="Opciones del simulacro">
+    <span class="lbl">Modo</span>
+    <div class="seg">
+      <button type="button" id="m-exam" aria-pressed="true">Examen</button>
+      <button type="button" id="m-study" aria-pressed="false">Estudio</button>
+    </div>
+    <span class="lbl" style="margin-left:8px">Penalización</span>
+    <div class="seg">
+      <button type="button" id="p-on" aria-pressed="true">−1/3 por error</button>
+      <button type="button" id="p-off" aria-pressed="false">Sin penalizar</button>
+    </div>
+    <p class="hint" id="modehint">Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».</p>
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="actions">
+    <button type="button" class="btn primary" id="grade">Corregir examen</button>
+    <button type="button" class="btn ghost" id="reset">Empezar de nuevo</button>
+  </div>
+
+  <section id="results" hidden></section>
+
+</main>
+
+<script>
+const BLOCKS=[
+  {name:"Anatomía del corazón",from:1,to:4},
+  {name:"Circulación y vasos sanguíneos",from:5,to:8},
+  {name:"Ciclo cardíaco, frecuencia cardíaca y pulso",from:9,to:12},
+  {name:"Constantes vitales y su registro",from:13,to:13},
+  {name:"Tensión arterial",from:14,to:18},
+  {name:"Alteraciones cardiovasculares y sistema linfático",from:19,to:20},
+  {name:"Temperatura corporal",from:21,to:25},
+  {name:"Respiración",from:26,to:28},
+  {name:"Balance hídrico y diuresis",from:29,to:30}
+];
+const Q=[
+{t:"¿Dónde está situado el corazón?",o:["En el mediastino, entre los dos pulmones y encima del diafragma, con unos dos tercios a la izquierda de la línea media y la punta (ápex) dirigida hacia abajo y a la izquierda.","En la cavidad abdominal, debajo del diafragma.","Entero en el lado izquierdo del tórax, con la punta hacia arriba.","Detrás de la columna vertebral."],a:0,j:"El corazón está en el mediastino, el espacio central del tórax, apoyado sobre el diafragma. La mayor parte queda a la izquierda, pero no todo (C es falsa). Su punta está a la altura del 5.º espacio entre costillas, en la línea que baja desde la mitad de la clavícula izquierda: ahí se escucha el pulso apical."},
+{t:"Sobre las capas de la pared del corazón, ¿qué afirmación es correcta?",o:["El epicardio es la capa que se contrae y el miocardio recubre las válvulas.","El pericardio es el músculo del corazón y el endocardio es la capa exterior.","El miocardio es el músculo que se contrae; el endocardio es la capa interna que recubre las cavidades y las válvulas; el pericardio envuelve el corazón por fuera.","El endocardio es la capa más externa."],a:2,j:"De dentro hacia fuera: endocardio, miocardio y pericardio. El endocardio es una capa fina que recubre el interior de las cavidades y las válvulas. El miocardio es el músculo y la capa más gruesa. El pericardio es una bolsa que protege el corazón. El epicardio es la hoja del pericardio pegada al músculo: es la trampa de A."},
+{t:"Sobre las cavidades del corazón, ¿qué afirmación es correcta?",o:["La aurícula izquierda recibe la sangre de las venas cavas.","La aurícula derecha recibe la sangre pobre en oxígeno de las venas cavas, y el ventrículo izquierdo tiene la pared más gruesa porque impulsa la sangre a todo el cuerpo.","El ventrículo derecho es el que tiene la pared más gruesa.","Las aurículas bombean la sangre directamente a la aorta."],a:1,j:"Las aurículas reciben la sangre y los ventrículos la impulsan. La aurícula derecha recibe la sangre pobre en oxígeno de las cavas; la izquierda, la sangre oxigenada de las cuatro venas pulmonares (A es falsa). El ventrículo izquierdo vence la resistencia de todo el cuerpo, por eso su pared es la más gruesa (C es falsa)."},
+{t:"¿Qué válvula separa la aurícula izquierda del ventrículo izquierdo?",o:["La tricúspide.","La pulmonar.","La aórtica.","La mitral (bicúspide)."],a:3,j:"Entre aurículas y ventrículos están la tricúspide (lado derecho) y la mitral o bicúspide (lado izquierdo). A la salida de los ventrículos están las sigmoideas: la pulmonar (ventrículo derecho) y la aórtica (ventrículo izquierdo). Todas impiden que la sangre vuelva hacia atrás. Para recordarlo: la «tri»cúspide está a la de«r»echa."},
+{t:"¿Cuál de estos vasos transporta sangre pobre en oxígeno?",o:["La aorta.","Las venas pulmonares.","La arteria pulmonar.","Las arterias coronarias."],a:2,j:"Trampa clásica: un vaso es arteria porque sale del corazón, no por el tipo de sangre. La arteria pulmonar sale del ventrículo derecho y lleva a los pulmones sangre pobre en oxígeno. Las venas pulmonares (B) devuelven al corazón sangre oxigenada. La aorta (A) y las coronarias (D) llevan sangre oxigenada."},
+{t:"¿Cuál es el recorrido correcto de la circulación mayor (sistémica)?",o:["Ventrículo izquierdo → válvula aórtica → aorta → arterias → capilares de los tejidos → venas → venas cavas → aurícula derecha.","Ventrículo derecho → arteria pulmonar → pulmones → venas pulmonares → aurícula izquierda.","Aurícula derecha → ventrículo izquierdo, directamente.","Ventrículo izquierdo → arteria pulmonar."],a:0,j:"La circulación mayor lleva sangre oxigenada a todos los tejidos y devuelve la sangre pobre en oxígeno al lado derecho del corazón. B describe la circulación menor o pulmonar, que oxigena la sangre en los pulmones. En un corazón sano no hay paso directo entre el lado derecho y el izquierdo (C). La arteria pulmonar sale del ventrículo derecho (D)."},
+{t:"Sobre las diferencias entre arterias y venas, ¿qué afirmación es correcta?",o:["Las venas tienen la pared más gruesa y soportan más presión.","Las arterias tienen válvulas para que la sangre no vuelva hacia atrás.","Todas las venas llevan sangre pobre en oxígeno.","Las arterias llevan la sangre desde el corazón, tienen la pared gruesa y elástica, soportan presión alta y en ellas se nota el pulso. Las venas devuelven la sangre al corazón, tienen la pared fina, soportan presión baja y muchas tienen válvulas, sobre todo las de las piernas."],a:3,j:"Las arterias aguantan la fuerza con la que el corazón expulsa la sangre: son gruesas, elásticas y laten. Las venas trabajan con poca presión, y sus válvulas y la contracción de los músculos de las piernas ayudan a que la sangre suba; cuando las válvulas fallan aparecen las varices. C es falsa: las venas pulmonares llevan sangre oxigenada."},
+{t:"¿Qué característica tienen los capilares sanguíneos?",o:["Una gruesa capa de músculo.","Una pared de una sola capa de células, que permite el intercambio de oxígeno, nutrientes y desechos con los tejidos.","Solo transportan linfa.","Regulan la presión arterial contrayéndose."],a:1,j:"Los capilares unen las arterias más pequeñas con las venas más pequeñas. Como su pared es tan fina, por ella pasan el oxígeno y los nutrientes hacia las células y los desechos hacia la sangre. No tienen músculo (A, D). La linfa (C) circula por los vasos linfáticos."},
+{t:"¿Qué ocurre durante la sístole ventricular?",o:["Los ventrículos se relajan y se llenan de sangre.","Las válvulas aórtica y pulmonar se cierran mientras se expulsa la sangre.","Los ventrículos se contraen y expulsan la sangre hacia la aorta y la arteria pulmonar. En la diástole, se relajan y se llenan.","Las aurículas se contraen y envían la sangre a la aorta."],a:2,j:"Sístole es contracción y diástole es relajación. En la sístole ventricular, las válvulas aórtica y pulmonar se abren para que salga la sangre (B es falsa). A describe la diástole. Las aurículas envían la sangre a los ventrículos, no a la aorta (D). La presión sistólica corresponde a la sístole y la diastólica a la diástole."},
+{t:"Un adulto en reposo tiene 112 pulsaciones por minuto. ¿Cómo se denomina?",o:["Taquicardia.","Frecuencia normal.","Bradicardia.","Arritmia."],a:0,j:"En un adulto en reposo, lo normal son 60-100 latidos por minuto. Por encima de 100 es taquicardia; por debajo de 60, bradicardia (C). La trampa es D: arritmia significa que el ritmo es irregular, y eso no se sabe solo con la cifra. Los niños tienen frecuencias más altas y los deportistas pueden tener bradicardia sin que sea un problema."},
+{t:"¿Cómo se toma correctamente el pulso radial?",o:["Con el pulgar, porque es el dedo más sensible.","Contando durante 10 segundos y multiplicando por 6.","Apretando fuerte la arteria hasta notar bien el latido.","Con las yemas de los dedos índice y medio (o con tres dedos) sobre la arteria radial, presionando con suavidad, contando durante un minuto completo (sobre todo si el ritmo es irregular) y valorando la frecuencia, el ritmo y la fuerza del pulso."],a:3,j:"El pulgar (A) no se usa porque tiene su propio pulso, que podría confundirse con el del paciente. Si se aprieta demasiado (C), la arteria se cierra y el pulso deja de notarse. Contar solo unos segundos (B) multiplica cualquier error, y si el ritmo es irregular hay que contar el minuto completo. Además de la frecuencia, se valoran el ritmo y la fuerza."},
+{t:"El TCAE encuentra a un paciente inconsciente en el pasillo. ¿Dónde y cómo debe comprobar el pulso?",o:["En la arteria radial, porque es la más accesible.","En la arteria carótida, a un lado del cuello, sin presionar nunca las dos carótidas a la vez.","En la arteria pedia, en el empeine.","En las dos carótidas a la vez, para comparar."],a:1,j:"En una emergencia se usa el pulso carotídeo: es una arteria grande y su pulso se mantiene aunque el radial (A) ya no se note. Nunca se presionan las dos carótidas a la vez (D), porque se reduce el riego del cerebro y puede bajar la frecuencia cardíaca. En lactantes se usa el pulso braquial. Lo primero, en cualquier caso, es pedir ayuda."},
+{t:"Sobre las constantes vitales y su registro, ¿qué afirmación es correcta?",o:["Las constantes vitales son solo la tensión arterial y la temperatura.","Se anotan de memoria al terminar el turno.","Las constantes vitales son la tensión arterial, el pulso (frecuencia cardíaca), la frecuencia respiratoria y la temperatura; muchos protocolos añaden la saturación de oxígeno y el dolor. Se registran enseguida en la gráfica, con la hora, y los valores anormales se comunican a enfermería. Si hay dudas, se repite la toma.","Si un valor es anormal, se espera a la siguiente toma programada."],a:2,j:"El registro debe ser inmediato y exacto; anotar de memoria (B) da lugar a errores. Un valor anormal se comunica en ese momento (D) para que se valore enseguida. Tomar, registrar y comunicar las constantes es función del TCAE; interpretarlas clínicamente corresponde a enfermería y al médico."},
+{t:"Un adulto en reposo tiene una tensión arterial de 150/95 mmHg. ¿Qué afirmación es correcta?",o:["La sistólica es 150 (la presión durante la contracción de los ventrículos) y la diastólica es 95 (la presión durante su relajación). Un valor de 140/90 o más se considera elevado, así que hay que comunicarlo.","150 es la presión diastólica.","Es una tensión arterial normal.","Es una hipotensión."],a:0,j:"La sistólica es la cifra más alta y la diastólica, la más baja. Según las guías europeas, de uso habitual en España, se considera hipertensión una cifra de 140/90 o más; las guías estadounidenses usan 130/80. Se habla de hipotensión con cifras inferiores a unos 90/60 (D). Una sola medición no diagnostica nada, pero el TCAE debe comunicar el valor."},
+{t:"Se mide la tensión arterial a un paciente con el brazo muy grueso usando un manguito estándar, que le queda demasiado estrecho. ¿Qué ocurre con el resultado?",o:["Sale más baja de lo real.","Sale más alta de lo real.","El manguito no influye en el resultado.","Solo cambia la presión diastólica."],a:1,j:"Con un manguito pequeño hay que inflar más para cerrar la arteria, y la tensión sale más alta de lo real; con uno demasiado grande ocurre lo contrario. Otros factores que suben la tensión son el ejercicio, el dolor, el estrés, el café y el tabaco. La bajan el sueño, el reposo prolongado y las hemorragias. Con la edad tiende a subir."},
+{t:"¿Cuál es la preparación correcta para medir la tensión arterial?",o:["Medirla en cuanto el paciente llega, aunque venga de andar deprisa.","Con el brazo colgando y el manguito puesto sobre la ropa.","Con el fonendoscopio metido debajo del manguito.","Con el paciente en reposo unos 5 minutos, sin haber tomado café, fumado ni hecho ejercicio poco antes; el brazo descubierto, apoyado a la altura del corazón y con la palma hacia arriba; y el manguito 2-3 cm por encima del pliegue del codo, centrado sobre la arteria humeral."],a:3,j:"El reposo previo evita que el resultado salga alto por el esfuerzo (A). Con el brazo por debajo del corazón (B), la tensión sale más alta, y la ropa también altera la medición. El fonendoscopio se coloca sobre la arteria humeral, en el pliegue del codo, y no debajo del manguito (C), porque produce ruidos y falsea la lectura."},
+{t:"¿Cómo se mide correctamente la tensión arterial con fonendoscopio?",o:["La presión diastólica es el primer ruido que se oye.","Se infla solo 10 mmHg por encima de la cifra esperada y se desinfla muy rápido.","Se infla el manguito unos 20-30 mmHg por encima del punto en que deja de notarse el pulso radial y se desinfla despacio, unos 2-3 mmHg por segundo. El primer ruido marca la sistólica y el momento en que desaparece el ruido, la diastólica.","La sistólica es el momento en que el ruido se oye más fuerte."],a:2,j:"Inflar 20-30 mmHg por encima del punto en que desaparece el pulso radial asegura que la arteria quede cerrada. Al desinflar despacio, el primer ruido (ruido de Korotkoff) es la sistólica y su desaparición es la diastólica. A invierte las cifras. Si se desinfla rápido (B), no se leen bien. Para repetir la medición, hay que esperar 1-2 minutos."},
+{t:"¿En qué brazo NO se debe medir la tensión arterial?",o:["En el brazo con una fístula para hemodiálisis, en el del lado de una mastectomía con extirpación de ganglios o en el que tiene una vía intravenosa con sueroterapia.","En el brazo dominante.","En el brazo derecho.","En el brazo sin vello."],a:0,j:"Inflar el manguito sobre una fístula de hemodiálisis puede dañarla o cerrarla. En el brazo de una mastectomía con extirpación de ganglios, la presión favorece el linfedema. Sobre una vía intravenosa, interrumpe el suero y puede dañar la vena. Tampoco se mide en un brazo con heridas, escayola o parálisis. B, C y D no son contraindicaciones."},
+{t:"Un paciente dice que tiene un dolor opresivo en el pecho que se extiende hacia el brazo izquierdo. Está sudoroso y pálido. ¿Qué debe hacer el TCAE?",o:["Pedirle que camine un poco para ver si se le pasa.","Avisar inmediatamente a enfermería o al médico, mantenerlo en reposo y semisentado, no dejarlo solo, aflojarle la ropa y tomar las constantes si se lo indican.","Darle un analgésico de su propio botiquín.","Esperar a la siguiente ronda para comentarlo."],a:1,j:"Un dolor opresivo en el pecho que se extiende al brazo o a la mandíbula, con sudor y palidez, puede ser un infarto: es una urgencia y la prioridad es avisar ya. El reposo reduce el esfuerzo del corazón, por eso caminar (A) es peligroso. El TCAE no da medicación por su cuenta (C). Esperar (D) retrasa una atención en la que cada minuto cuenta."},
+{t:"¿Cuáles son las funciones del sistema linfático?",o:["Bombear la sangre por todo el cuerpo.","Transportar el oxígeno a los tejidos.","Hacer circular la linfa gracias a un corazón linfático propio.","Devolver a la sangre el líquido que sobra en los tejidos, absorber las grasas en el intestino y participar en la defensa del organismo, a través de los ganglios linfáticos, el bazo y el timo."],a:3,j:"El sistema linfático recoge el líquido que queda entre las células y lo devuelve a las venas; si falla, aparece edema. También absorbe las grasas en el intestino y defiende el organismo gracias a los ganglios. No tiene bomba propia (C): la linfa avanza por la contracción de los músculos y sus válvulas. El oxígeno (B) lo transporta la sangre."},
+{t:"Un paciente suda mucho. ¿Qué órgano regula la temperatura del cuerpo y por qué mecanismo pierde calor este paciente?",o:["El corazón; por conducción.","El cerebelo; por radiación.","El hipotálamo; por evaporación del sudor.","El riñón; por convección."],a:2,j:"El hipotálamo, en el cerebro, funciona como un termostato. El cuerpo produce calor con el metabolismo, el ejercicio y los escalofríos, y lo pierde por evaporación (sudor), radiación (cede calor al ambiente), conducción (contacto con superficies frías) y convección (aire que se mueve alrededor del cuerpo). A, B y D se equivocan de órgano."},
+{t:"Un paciente tiene una temperatura axilar de 37,6 °C. ¿Cómo se clasifica?",o:["Febrícula.","Fiebre alta.","Hipertermia.","Temperatura normal."],a:0,j:"La temperatura axilar normal es de unos 36-37 °C. Clasificación habitual: febrícula, entre 37 y 38 °C; fiebre, más de 38 °C; hipertermia o hiperpirexia, por encima de 40-41 °C (algunos manuales usan «hipertermia» para cuando falla la termorregulación, como el golpe de calor); hipotermia, por debajo de 35 °C. Los límites varían ligeramente, pero 37,6 °C es febrícula con cualquier criterio."},
+{t:"¿En qué paciente está contraindicado tomar la temperatura por la boca?",o:["Un adulto consciente que colabora.","Un paciente que no ha comido en la última hora.","Un paciente con la dentadura en buen estado.","Un paciente inconsciente, con dificultad para respirar, convulsiones o una operación en la boca, o un niño pequeño. Además, hay que esperar 15-30 minutos si el paciente acaba de comer, beber o fumar."],a:3,j:"Para tomarla por la boca, el paciente tiene que mantener el termómetro bajo la lengua con la boca cerrada, y eso no es posible ni seguro en los casos de D: podría morderlo o tragarlo. Comer, beber o fumar justo antes altera el resultado. La temperatura rectal está contraindicada si hay cirugía rectal, hemorroides o diarrea; es la más fiable y suele dar 0,5-1 °C más que la axilar."},
+{t:"¿Cómo se toma correctamente la temperatura axilar?",o:["Con un termómetro de mercurio, que es el más fiable y el de uso habitual hoy.","Se seca la axila, se coloca la punta del termómetro en el centro del hueco de la axila y se mantiene el brazo pegado al cuerpo, con el antebrazo sobre el pecho, hasta que el termómetro digital avise. No se usan termómetros de mercurio, porque están prohibidos en la Unión Europea.","Por encima de la ropa.","Sin secar la axila, porque el sudor hace que la medición sea más alta."],a:1,j:"El sudor enfría la piel al evaporarse, así que hace que la temperatura salga más baja (D es falsa) y hay que secar la axila antes. La punta debe estar en contacto con la piel, en el centro de la axila y con el brazo cerrado; la ropa (C) lo impide. Los termómetros de mercurio (A) están prohibidos en la UE por su toxicidad: hoy se usan digitales o de infrarrojos."},
+{t:"Un paciente tiene 38,8 °C. Enfermería ya está informada. ¿Qué debe hacer el TCAE?",o:["Taparlo con varias mantas.","Bañarlo con agua helada o frotarle la piel con alcohol.","Quitarle la ropa de abrigo que sobre, ponerle paños húmedos templados, ofrecerle líquidos si no tiene restricción, cambiarle la ropa si suda, registrar la temperatura y volver a tomarla cuando le indiquen. Los antitérmicos solo se dan con prescripción.","Darle un antitérmico por su cuenta."],a:2,j:"Las medidas físicas ayudan a que el cuerpo pierda calor de forma suave. Las mantas (A) lo dificultan. El agua helada (B) contrae los vasos de la piel y produce escalofríos, que generan más calor; el alcohol irrita la piel y puede absorberse. La fiebre hace perder líquidos, por eso hay que hidratar. Los antitérmicos (D) requieren prescripción."},
+{t:"¿Cómo se mide correctamente la frecuencia respiratoria de un adulto?",o:["Sin que el paciente se dé cuenta (por ejemplo, justo después de tomar el pulso, sin soltarle la muñeca), contando las veces que se eleva el tórax durante un minuto. Lo normal son 12-20 respiraciones por minuto.","Avisando al paciente de que se le van a contar las respiraciones.","Contando por separado las inspiraciones y las espiraciones, y sumándolas.","Contando siempre 15 segundos y multiplicando por 4."],a:0,j:"La respiración se puede controlar a voluntad: si el paciente sabe que le cuentan (B), la cambia sin darse cuenta. Por eso se disimula manteniendo la mano en la muñeca. Una respiración es una inspiración más una espiración, así que contarlas por separado (C) duplica la cifra. Más de 20 es taquipnea, menos de 12 es bradipnea y la ausencia de respiración es apnea."},
+{t:"Un paciente diabético descompensado respira muy deprisa y muy profundo, y su aliento huele a fruta. ¿Qué tipo de respiración es?",o:["Cheyne-Stokes.","Biot.","Bradipnea.","Kussmaul."],a:3,j:"La respiración de Kussmaul es rápida y profunda, típica de la descompensación grave de la diabetes, con aliento afrutado. Cheyne-Stokes (A): ciclos de respiraciones cada vez más profundas y luego más superficiales, hasta una pausa sin respirar (insuficiencia cardíaca, lesiones neurológicas, pacientes moribundos). Biot (B): respiraciones irregulares, sin patrón, con pausas (lesiones del sistema nervioso central)."},
+{t:"Un paciente con insuficiencia cardíaca dice que se ahoga cuando se tumba y que necesita varias almohadas o dormir sentado. ¿Cómo se llama esta alteración?",o:["Apnea.","Ortopnea.","Taquipnea.","Bradipnea."],a:1,j:"La ortopnea es la dificultad para respirar al estar tumbado, que mejora al incorporarse; es típica de la insuficiencia cardíaca. La disnea es la sensación de dificultad para respirar en general. A, C y D se refieren a la frecuencia de la respiración, no a la postura. Una posición útil para este paciente es la de Fowler."},
+{t:"En 24 horas, un paciente recibe 1.500 ml de suero intravenoso y bebe 800 ml. En el mismo tiempo, orina 1.200 ml, vomita 300 ml y su drenaje recoge 200 ml. Sin contar las pérdidas insensibles, ¿cuál es su balance hídrico?",o:["+600 ml (balance positivo).","−600 ml (balance negativo).","+4.000 ml.","0 ml (balance neutro)."],a:0,j:"Ingresos: 1.500 + 800 = 2.300 ml. Pérdidas: 1.200 + 300 + 200 = 1.700 ml. Balance = ingresos − pérdidas = +600 ml. Un balance positivo indica que el paciente retiene líquido y puede tener edemas; uno negativo, riesgo de deshidratación. C suma todo en lugar de restar. Las pérdidas insensibles (respiración y piel) no se miden: se estiman, y algunos protocolos las incluyen."},
+{t:"Un paciente lleva sonda vesical y en 24 horas su bolsa recoge 300 ml de orina. ¿Qué afirmación es correcta?",o:["Es una diuresis normal.","Es anuria.","Es oliguria y hay que comunicarlo. La diuresis se mide vaciando la bolsa por su grifo inferior en un recipiente graduado, sin desconectar la sonda y con la bolsa siempre por debajo de la vejiga. Si el paciente usa pañal, se pesa (1 g equivale aproximadamente a 1 ml).","Es poliuria."],a:2,j:"La diuresis normal de un adulto es de unos 1.000-1.500 ml al día. Oliguria: menos de unos 400-500 ml al día. Anuria (B): menos de unos 100 ml. Poliuria (D): más de unos 2.500 ml. Las cifras varían un poco según el manual, pero 300 ml es oliguria con cualquier criterio. Desconectar la sonda aumenta el riesgo de infección, y con la bolsa por encima de la vejiga la orina puede volver. El TCAE mide, registra y comunica."}
+];
+const L=["A","B","C","D"];
+const state={ans:Array(30).fill(null),mode:"exam",pen:true,graded:false};
+const $=s=>document.querySelector(s);
+const quiz=$("#quiz");
+
+function render(){
+  let h="";
+  BLOCKS.forEach(b=>{
+    h+=`<div class="block-h">${b.name}</div>`;
+    for(let i=b.from-1;i<b.to;i++){
+      const q=Q[i];
+      h+=`<article class="q" id="q${i+1}"><div class="q-num">Pregunta ${i+1} de 30</div><p class="q-text">${q.t}</p><div class="opts" role="group" aria-label="Opciones de la pregunta ${i+1}">`;
+      q.o.forEach((o,k)=>{h+=`<button type="button" class="opt" id="q${i+1}o${k}" data-q="${i}" data-k="${k}"><span class="k">${L[k]}</span><span class="tx">${o}</span></button>`});
+      h+=`</div><div class="q-foot"><button type="button" class="linkbtn" data-clear="${i}">Dejar en blanco</button></div><div class="fb" id="fb${i}" hidden></div></article>`;
+    }
+  });
+  quiz.innerHTML=h;
+}
+function revealed(i){return state.graded||(state.mode==="study"&&state.ans[i]!==null)}
+function paint(i){
+  const q=Q[i],a=state.ans[i],show=revealed(i);
+  q.o.forEach((_,k)=>{
+    const b=document.getElementById(`q${i+1}o${k}`);
+    b.className="opt";
+    if(show){
+      if(k===q.a)b.classList.add("right");
+      else if(k===a)b.classList.add("wrong");
+      b.disabled=true;
+    }else{
+      if(k===a)b.classList.add("sel");
+      b.disabled=false;
+    }
+    b.setAttribute("aria-pressed",k===a?"true":"false");
+  });
+  const clr=document.querySelector(`[data-clear="${i}"]`);
+  clr.hidden=show||a===null;
+  const fb=document.getElementById("fb"+i);
+  if(show){
+    let cls,v;
+    if(a===null){cls="blank";v=`En blanco. La respuesta correcta es la ${L[q.a]}.`}
+    else if(a===q.a){cls="ok";v=`Correcta: ${L[q.a]}.`}
+    else{cls="bad";v=`Incorrecta. Marcaste la ${L[a]}; la correcta es la ${L[q.a]}.`}
+    fb.className="fb "+cls;
+    fb.innerHTML=`<span class="v">${v}</span>${q.j}`;
+    fb.hidden=false;
+  }else fb.hidden=true;
+}
+function paintAll(){for(let i=0;i<30;i++)paint(i);progress()}
+function progress(){
+  const n=state.ans.filter(x=>x!==null).length;
+  $("#counter").textContent=`${n}/30 respondidas`;
+  $("#barfill").style.width=(n/30*100)+"%";
+}
+function setPressed(on,off){on.setAttribute("aria-pressed","true");off.setAttribute("aria-pressed","false")}
+
+quiz.addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&!o.disabled){state.ans[+o.dataset.q]=+o.dataset.k;paint(+o.dataset.q);progress();if(state.graded)grade(false);return}
+  const c=e.target.closest("[data-clear]");
+  if(c){state.ans[+c.dataset.clear]=null;paint(+c.dataset.clear);progress()}
+});
+$("#m-exam").onclick=()=>{state.mode="exam";setPressed($("#m-exam"),$("#m-study"));$("#modehint").textContent="Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».";paintAll()};
+$("#m-study").onclick=()=>{state.mode="study";setPressed($("#m-study"),$("#m-exam"));$("#modehint").textContent="Modo estudio: al responder cada pregunta ves enseguida si es correcta y su justificación.";paintAll()};
+$("#p-on").onclick=()=>{state.pen=true;setPressed($("#p-on"),$("#p-off"));if(state.graded)grade(false)};
+$("#p-off").onclick=()=>{state.pen=false;setPressed($("#p-off"),$("#p-on"));if(state.graded)grade(false)};
+$("#grade").onclick=()=>grade(true);
+$("#reset").onclick=()=>{
+  state.ans=Array(30).fill(null);state.graded=false;
+  $("#results").hidden=true;$("#grade").textContent="Corregir examen";
+  paintAll();window.scrollTo({top:0,behavior:"smooth"});
+};
+
+function fmt(x){return x.toFixed(2).replace(".",",")}
+function grade(scroll){
+  state.graded=true;paintAll();
+  let ok=0,bad=0,blank=0;
+  state.ans.forEach((a,i)=>{if(a===null)blank++;else if(a===Q[i].a)ok++;else bad++});
+  const net=state.pen?Math.max(0,ok-bad/3):ok;
+  const nota=net*10/30;
+  const pass=nota>=5;
+  let rows="";
+  BLOCKS.forEach(b=>{
+    let c=0,t=b.to-b.from+1;
+    for(let i=b.from-1;i<b.to;i++)if(state.ans[i]===Q[i].a)c++;
+    rows+=`<tr><td>${b.name}</td><td class="num">${b.from}–${b.to}</td><td class="num">${c}/${t}</td><td><div class="mini"><i style="width:${c/t*100}%"></i></div></td></tr>`;
+  });
+  const fails=[];state.ans.forEach((a,i)=>{if(a!==Q[i].a)fails.push(i+1)});
+  const formula=state.pen
+    ?`[${ok} − (${bad} ÷ 3)] × (10 ÷ 30) = ${fmt(nota)}`
+    :`${ok} × (10 ÷ 30) = ${fmt(nota)}`;
+  $("#results").innerHTML=`
+    <div class="eyebrow">Resultado</div>
+    <h2>Tu nota en el simulacro</h2>
+    <div class="score"><span class="n">${fmt(nota)}</span><span class="of">sobre 10</span><span class="pill ${pass?"pass":"fail"}">${pass?"Aprobado":"Suspenso"}</span></div>
+    <div class="tally"><div><span>Aciertos</span><b>${ok}</b></div><div><span>Errores</span><b>${bad}</b></div><div><span>En blanco</span><b>${blank}</b></div></div>
+    <div class="formula">${formula}</div>
+    ${fails.length?`<p class="note">Repasa las preguntas: ${fails.map(n=>`<a href="#q${n}">${n}</a>`).join(", ")}.</p>`:`<p class="note">Sin fallos ni preguntas en blanco.</p>`}
+    <h3>Aciertos por bloque</h3>
+    <div class="tbl-wrap"><table><thead><tr><th>Bloque</th><th>Preguntas</th><th>Aciertos</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3>Cómo se calcula la nota</h3>
+    <p>Con penalización, cada error resta un tercio de acierto y las preguntas en blanco no cuentan. Para un 5 necesitas 15 puntos netos. No existe una fórmula única para todas las pruebas libres: consulta los criterios de calificación que publica el centro donde te examines.</p>
+    <p>Estrategia: si se penalizan los errores, responde solo cuando puedas descartar al menos dos opciones con seguridad. Si no se penalizan, contesta todas.</p>
+    <h3>Lo que más se pregunta</h3>
+    <ul class="tips">
+      <li>La arteria pulmonar lleva sangre pobre en oxígeno; las venas pulmonares, sangre oxigenada.</li>
+      <li>Válvulas: tricúspide a la derecha, mitral a la izquierda. El ventrículo izquierdo tiene la pared más gruesa.</li>
+      <li>Circulación mayor frente a menor, con su recorrido completo.</li>
+      <li>Pulso: nunca con el pulgar, nunca en las dos carótidas a la vez y un minuto si el ritmo es irregular. En lactantes, pulso braquial.</li>
+      <li>Tensión arterial: primer ruido, sistólica; desaparición, diastólica. Manguito pequeño, cifra más alta. No en el brazo con fístula, mastectomía o suero.</li>
+      <li>Clasificación de la temperatura y contraindicaciones de cada lugar. El sudor hace que la axilar salga más baja.</li>
+      <li>Kussmaul en la diabetes descompensada; Cheyne-Stokes con ciclos y pausas; Biot irregular. Ortopnea: ahogo al tumbarse.</li>
+      <li>Cálculo del balance hídrico y cifras de oliguria, anuria y poliuria.</li>
+      <li>Límites del TCAE: mide, registra y comunica; no interpreta clínicamente ni da medicación por su cuenta.</li>
+    </ul>`;
+  $("#results").hidden=false;
+  $("#grade").textContent="Recalcular nota";
+  if(scroll)$("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+render();paintAll();
+</script>
+
+</html>
