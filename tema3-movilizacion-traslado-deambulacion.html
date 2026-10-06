@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 3. Movilización, traslado y deambulación del paciente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: hoja de examen en una columna; cabecera fija con progreso; resultados al final */
+:root{
+  --bg:#f3f6f7; --paper:#ffffff; --ink:#15262e; --muted:#5a6d75; --line:#d5dfe2;
+  --accent:#0d6e66; --accent-soft:#dcefec;
+  --ok:#1d7a3a; --ok-soft:#e3f3e7; --bad:#b4332d; --bad-soft:#fbe6e4; --blank:#8a6a12; --blank-soft:#fbf2d9;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top-in .t{font:700 15px/1.2 var(--display);flex:1 1 200px;min-width:0}
+.counter{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex:1 1 100%}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.intro{padding-block:36px 8px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(30px,6vw,44px)/1.08 var(--display);margin:.25em 0 .35em;text-wrap:balance}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;padding:0;list-style:none;font-size:15px}
+.meta b{font-family:var(--mono);font-weight:500}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0 8px;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.controls .lbl{font-weight:700;font-size:15px;margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--paper)}
+.controls .hint{flex:1 1 100%;font-size:14px;color:var(--muted);margin:0}
+.block-h{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+.block-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;margin-bottom:16px;scroll-margin-top:90px}
+.q-num{font:500 13px var(--mono);color:var(--accent)}
+.q-text{font-weight:600;margin:6px 0 14px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:500 13px var(--mono)}
+.opt .tx{min-width:0}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .k{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:var(--paper);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.q-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.linkbtn{background:none;border:0;color:var(--muted);font:600 14px var(--body);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15.5px}
+.fb.ok{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)} .fb.blank{background:var(--blank-soft)}
+.fb .v{font-weight:700;display:block;margin-bottom:4px}
+.fb.ok .v{color:var(--ok)} .fb.bad .v{color:var(--bad)} .fb.blank .v{color:var(--blank)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
+.btn{font:700 16px var(--body);border-radius:8px;padding:12px 20px;cursor:pointer;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#results{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px 20px;margin-top:8px;scroll-margin-top:80px}
+#results h2{font:700 26px/1.15 var(--display);margin:0 0 4px}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin:12px 0 18px}
+.score .n{font:700 64px/1 var(--display);font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted);font-family:var(--mono);font-size:15px}
+.pill{display:inline-block;font:700 13px var(--body);padding:4px 10px;border-radius:999px}
+.pill.pass{background:var(--ok-soft);color:var(--ok)} .pill.fail{background:var(--bad-soft);color:var(--bad)}
+.tally{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.tally div{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tally span{display:block;font-size:13px;color:var(--muted)}
+.tally b{font:500 22px var(--mono);font-variant-numeric:tabular-nums}
+.formula{font-family:var(--mono);font-size:14px;background:var(--bg);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini{height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:70px}
+.mini i{display:block;height:100%;background:var(--accent)}
+.tips{margin:20px 0 0;padding-left:20px}
+.tips li{margin-bottom:6px}
+h3{font:700 18px var(--display);margin:24px 0 8px}
+.note{font-size:14px;color:var(--muted);margin-top:16px}
+footer{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
+@media (max-width:480px){.q{padding:16px 14px}.tally{grid-template-columns:1fr 1fr 1fr}.score .n{font-size:52px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <span class="t">Tema 3 · 30 preguntas</span>
+  <span class="counter" id="counter">0/30 respondidas</span>
+  <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">Pruebas libres · Técnico en Cuidados Auxiliares de Enfermería</div>
+    <h1>Tema 3. Movilización, traslado y deambulación del paciente</h1>
+    <p class="lead">Simulacro tipo test con casos prácticos y preguntas trampa. Elige una respuesta en cada pregunta. Puedes dejar preguntas en blanco: no suman ni restan.</p>
+    <ul class="meta">
+      <li><b>30</b> preguntas</li>
+      <li><b>4</b> opciones, una correcta</li>
+      <li>Tiempo orientativo: <b>45 min</b></li>
+    </ul>
+  </section>
+
+  <div class="controls" role="group" aria-label="Opciones del simulacro">
+    <span class="lbl">Modo</span>
+    <div class="seg">
+      <button type="button" id="m-exam" aria-pressed="true">Examen</button>
+      <button type="button" id="m-study" aria-pressed="false">Estudio</button>
+    </div>
+    <span class="lbl" style="margin-left:8px">Penalización</span>
+    <div class="seg">
+      <button type="button" id="p-on" aria-pressed="true">−1/3 por error</button>
+      <button type="button" id="p-off" aria-pressed="false">Sin penalizar</button>
+    </div>
+    <p class="hint" id="modehint">Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».</p>
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="actions">
+    <button type="button" class="btn primary" id="grade">Corregir examen</button>
+    <button type="button" class="btn ghost" id="reset">Empezar de nuevo</button>
+  </div>
+
+  <section id="results" hidden></section>
+
+</main>
+
+<script>
+const BLOCKS=[
+  {name:"Aparato locomotor y huesos",from:1,to:5},
+  {name:"Posiciones del paciente",from:6,to:13},
+  {name:"Cambios posturales",from:14,to:15},
+  {name:"Movilización en la cama",from:16,to:17},
+  {name:"Transferencias y traslados",from:18,to:22},
+  {name:"Ayuda a la deambulación",from:23,to:27},
+  {name:"Prevención de caídas y ergonomía",from:28,to:30}
+];
+const Q=[
+{t:"Sobre el aparato locomotor, ¿qué afirmación es correcta?",o:["Está formado solo por los huesos.","Los músculos forman su parte pasiva.","Los huesos y las articulaciones forman la parte pasiva, y los músculos, con sus tendones, la parte activa, que es la que produce el movimiento.","Los ligamentos unen los músculos con los huesos."],a:2,j:"El aparato locomotor tiene una parte pasiva (huesos y articulaciones) y una parte activa (los músculos, que se contraen y mueven los huesos como palancas). La trampa es D: los tendones unen músculo con hueso, y los ligamentos unen hueso con hueso y estabilizan las articulaciones."},
+{t:"En una persona adulta, ¿dónde se forman las células de la sangre (hematopoyesis)?",o:["En la médula ósea roja, situada en el hueso esponjoso de los huesos planos (esternón, coxal, vértebras) y en las epífisis.","En la médula ósea amarilla del canal medular de la diáfisis.","En el periostio.","En el cartílago articular."],a:0,j:"Además de sostener, proteger, permitir el movimiento y almacenar minerales, los huesos forman las células de la sangre en la médula ósea roja. Por eso las punciones de médula se hacen en el esternón o en la cresta ilíaca. En el adulto, la médula amarilla (B) es sobre todo grasa de reserva. El periostio (C) y el cartílago (D) no producen células sanguíneas."},
+{t:"Un paciente se fractura la falange proximal del dedo índice. Según su forma, ¿qué tipo de hueso es la falange?",o:["Corto.","Plano.","Irregular.","Largo."],a:3,j:"Trampa clásica: un hueso es largo por su forma, no por su tamaño. Tiene un cuerpo alargado (diáfisis) y dos extremos (epífisis). Las falanges, los metacarpianos y los metatarsianos son huesos largos aunque sean pequeños. Los cortos (A) son más o menos cúbicos, como los del carpo y el tarso."},
+{t:"¿Qué asociación entre hueso y clasificación es correcta?",o:["Rótula: hueso largo.","Huesos del carpo: huesos cortos; esternón: hueso plano.","Vértebras: huesos planos.","Fémur: hueso corto."],a:1,j:"Cortos: carpo y tarso. Planos: esternón, costillas, escápula y bóveda del cráneo. Largos: fémur, húmero, tibia, falanges. Irregulares: vértebras. Sesamoideos: rótula, que está dentro de un tendón."},
+{t:"En un hueso largo, ¿qué afirmación es correcta?",o:["La diáfisis es de hueso esponjoso y contiene médula roja.","El periostio cubre también las superficies articulares.","La diáfisis es de hueso compacto y contiene el canal medular; las epífisis son de hueso esponjoso y, en la articulación, están cubiertas por cartílago articular.","El hueso crece en longitud gracias al periostio."],a:2,j:"La diáfisis es de hueso compacto y por dentro tiene el canal medular; las epífisis son de hueso esponjoso. El periostio recubre el hueso por fuera excepto en las superficies articulares, cubiertas por cartílago (B es falsa); permite el crecimiento en grosor y la reparación de fracturas. El crecimiento en longitud (D) se produce en el cartílago de crecimiento, entre la diáfisis y la epífisis."},
+{t:"Un paciente con EPOC está encamado y tiene dificultad para respirar. ¿Qué posición es la más adecuada?",o:["Fowler: semisentado, con la cabecera elevada unos 45°.","Trendelenburg.","Decúbito prono.","Decúbito supino con la cama horizontal."],a:0,j:"En Fowler, el contenido del abdomen desciende y el diafragma se mueve con más libertad, así que el paciente respira mejor; también se usa para comer y en problemas cardíacos. Suele indicarse semi-Fowler unos 30°, Fowler unos 45° y Fowler alta unos 90° (varía algo según el manual). En Trendelenburg (B) las vísceras empujan el diafragma y respirar cuesta más."},
+{t:"La enfermera va a administrar un enema de limpieza. ¿En qué posición coloca el TCAE al paciente?",o:["Sims sobre el lado derecho.","Sims (semiprona) sobre el lado izquierdo: de lado, ligeramente hacia delante, con la pierna derecha flexionada sobre la izquierda.","Trendelenburg.","Fowler."],a:1,j:"La posición de Sims está entre el decúbito lateral y el prono. Se usa para enemas, supositorios, exploración rectal y en pacientes inconscientes, porque facilita la salida de secreciones de la boca. Se hace sobre el lado izquierdo porque el colon sigmoide y el descendente están en ese lado, y así el líquido entra por gravedad. El lado derecho (A) es la trampa."},
+{t:"¿En cuál de estas situaciones está contraindicada la posición de Trendelenburg?",o:["Lipotimia (desmayo).","Drenaje postural de secreciones.","Cirugía pélvica.","Traumatismo craneal con aumento de la presión intracraneal."],a:3,j:"En Trendelenburg el paciente está boca arriba con la cama inclinada y la cabeza más baja que los pies. Aumenta el riego hacia la cabeza, por eso está contraindicada si hay traumatismo craneal o aumento de la presión intracraneal. Tampoco conviene si hay dificultad respiratoria o hernia de hiato. A, B y C son usos habituales."},
+{t:"Un paciente tiene hernia de hiato y reflujo. ¿Qué posición está indicada?",o:["Trendelenburg.","Decúbito prono.","Anti-Trendelenburg: la cama entera inclinada, con la cabeza más alta que los pies.","Genupectoral."],a:2,j:"En anti-Trendelenburg (Trendelenburg invertido) se inclina toda la cama, sin doblarla, para que la cabeza quede más alta que los pies. La gravedad dificulta que el contenido del estómago suba al esófago, y además facilita la respiración. Trendelenburg (A) favorece el reflujo."},
+{t:"¿Qué posición se usa para el sondaje vesical de una mujer y para la exploración ginecológica?",o:["Litotomía o ginecológica: boca arriba, con las piernas flexionadas y separadas, y los pies en estribos si se usa una camilla de exploración.","Genupectoral.","Sims.","Anti-Trendelenburg."],a:0,j:"La litotomía deja a la vista el periné. Se usa en exploraciones ginecológicas, partos, sondajes vesicales femeninos e higiene genital. Como deja muy expuesta a la paciente, hay que cubrirla con una sábana y descubrir solo lo necesario para proteger su intimidad."},
+{t:"¿Qué descripción corresponde a la posición genupectoral?",o:["Sentado, con la cabecera a 90°.","De lado, con la pierna de arriba flexionada.","Boca arriba, con las piernas en estribos.","De rodillas, con el pecho y la cara apoyados en la cama, la cabeza girada, los brazos flexionados y los muslos perpendiculares a la cama."],a:3,j:"En la genupectoral el paciente se apoya en las rodillas y el pecho. Se usa en exploraciones del recto y de la vagina, como la rectoscopia. Es incómoda y cansa: se mantiene el menor tiempo posible, sin dejar solo al paciente y cuidando su intimidad. A es Fowler alta, B decúbito lateral y C litotomía."},
+{t:"Hay que colocar a un paciente en decúbito prono. ¿Dónde se ponen las almohadas?",o:["Una almohada gruesa bajo la cabeza, con la cara hacia el colchón.","La cabeza girada hacia un lado, con una almohada fina o sin ella; una almohada bajo el abdomen y otra bajo las piernas, para que los dedos de los pies no apoyen en la cama.","Solo bajo las rodillas.","No se usan almohadas."],a:1,j:"En decúbito prono la cabeza se gira hacia un lado para respirar bien. La almohada bajo el abdomen reduce la curvatura lumbar y alivia la presión sobre las mamas. La de las piernas evita el pie equino y que los dedos apoyen en la cama. Una almohada gruesa con la cara hacia el colchón (A) dificulta la respiración."},
+{t:"En decúbito supino, ¿cuál de estas zonas NO es un punto de apoyo principal?",o:["Sacro.","Talones.","Trocánter mayor (cadera, por el lado).","Occipital (parte de atrás de la cabeza)."],a:2,j:"Boca arriba, el cuerpo apoya sobre todo en el occipital, los omóplatos, los codos, el sacro y los talones. El trocánter mayor es un punto de apoyo del decúbito lateral, junto con la oreja, el hombro, la cara externa de la rodilla y el tobillo. Conocerlos sirve para saber qué zonas vigilar y proteger."},
+{t:"Sobre los cambios posturales del paciente encamado, ¿qué afirmación es correcta?",o:["Si el paciente tiene riesgo de lesiones por presión, se hacen de forma programada (habitualmente cada 2-3 horas, según el plan de cuidados), alternando posiciones, y se registran.","Solo se hacen cuando aparece un enrojecimiento en la piel.","Basta con hacerlos cada 8 horas.","Solo se hacen de día, para no despertar al paciente."],a:0,j:"Los cambios posturales previenen lesiones por presión, rigidez articular y complicaciones respiratorias y circulatorias. Se hacen antes de que aparezcan lesiones (B), también de noche (D), siguiendo un calendario y registrándolos. La frecuencia la marca el plan de cuidados según el riesgo; la referencia habitual es cada 2-3 horas. Cada 8 horas (C) es insuficiente."},
+{t:"¿Qué actuación reduce el daño por rozamiento (fricción) y por deslizamiento de la piel (cizalla) en el paciente encamado?",o:["Arrastrar al paciente sobre la sábana para recolocarlo.","Mantener la cabecera elevada a 60-90° durante mucho tiempo.","Masajear con energía las prominencias óseas.","Usar una sábana de traslado (entremetida) para mover al paciente sin arrastrarlo y, salvo indicación, no elevar la cabecera más de 30°."],a:3,j:"Al arrastrar al paciente (A), la piel roza con la sábana. Con la cabecera muy elevada (B), el cuerpo se desliza hacia los pies mientras la piel se queda pegada a la cama y se dañan los tejidos del sacro; por eso, sin otra indicación, se aconseja no superar los 30°. La entremetida permite levantar en lugar de arrastrar. Masajear las prominencias óseas (C) daña los tejidos."},
+{t:"Un paciente que puede colaborar se ha deslizado hacia los pies de la cama. ¿Cuál es la preparación correcta para subirlo hacia la cabecera?",o:["Elevar la cabecera para que pueda agarrarse mejor.","Frenar la cama, ponerla horizontal y a una altura cómoda, colocar la almohada contra el cabecero, pedirle que flexione las rodillas y apoye los pies, y que empuje a la señal mientras el TCAE le ayuda.","Tirar de sus brazos desde la cabecera.","Tirar de sus axilas desde la cabecera, sin pedirle que colabore."],a:1,j:"Con la cama frenada y horizontal, el movimiento cuesta menos que contra la pendiente de A. La almohada contra el cabecero protege la cabeza de golpes. Al empujar con las piernas flexionadas, el paciente hace parte del esfuerzo, y moverse a la vez reduce la carga del TCAE. Tirar de brazos o axilas (C, D) puede lesionar el hombro del paciente y la espalda del TCAE."},
+{t:"El TCAE está en el lado derecho de la cama y va a girar al paciente hacia sí, al decúbito lateral derecho. ¿Cuál es la secuencia correcta?",o:["Primero desplazar al paciente hacia el lado izquierdo de la cama; después cruzar su brazo izquierdo sobre el pecho y su pierna izquierda sobre la derecha; por último sujetarlo por el hombro y la cadera izquierdos y girarlo hacia sí.","Girarlo sin desplazarlo, tirando de su brazo.","Desplazarlo hacia el lado derecho y luego girarlo hacia la derecha.","Cruzar su pierna derecha sobre la izquierda y girarlo sujetándolo solo por la cabeza."],a:0,j:"Primero se lleva al paciente hacia el lado contrario al giro, para que al girar quede centrado. Si se desplaza hacia el mismo lado del giro (C), terminaría en el borde con riesgo de caer. Cruzar el brazo y la pierna del lado lejano hace que el cuerpo gire en bloque, y sujetar por hombro y cadera reparte la fuerza. Tirar del brazo (B) o mover solo la cabeza (D) puede causar lesiones."},
+{t:"Un paciente lleva 10 días encamado y va a sentarse en el sillón por primera vez. Al sentarlo en el borde de la cama, se pone pálido y dice que está mareado. ¿Qué debe hacer el TCAE?",o:["Levantarlo rápido para que se le pase el mareo.","Seguir con la transferencia sujetándolo con fuerza.","Interrumpir la transferencia, volver a acostarlo con cuidado, vigilarlo y comunicarlo a enfermería. Antes de levantar a un paciente encamado, hay que dejarlo sentado unos minutos en el borde de la cama.","Darle agua fría y continuar."],a:2,j:"Tras un encamamiento largo, al incorporarse baja la tensión arterial (hipotensión ortostática) y el paciente puede marearse o desmayarse. Por eso primero se le sienta en el borde de la cama con las piernas colgando y se espera unos minutos observándolo. Si aparecen síntomas, se interrumpe, se le acuesta y se comunica. A, B y D aumentan el riesgo de caída."},
+{t:"Un paciente con hemiplejía izquierda va a pasar de la cama al sillón. ¿Qué es lo correcto?",o:["Colocar el sillón en el lado izquierdo de la cama.","Pedir al paciente que se agarre al cuello del TCAE.","Dejar el sillón sin frenar para poder ajustarlo durante el movimiento.","Colocar el sillón frenado junto a la cama, por el lado derecho (el sano). El TCAE se pone delante, con las rodillas flexionadas, bloquea con su rodilla la rodilla afectada y lo sujeta por la cintura. El paciente apoya las manos en los hombros o la cintura del TCAE, o en los apoyabrazos, nunca en su cuello."],a:3,j:"El sillón va en el lado sano para que el paciente se apoye y gire sobre la pierna con fuerza; el lado afectado (A) es la trampa. El sillón debe estar frenado (C). Bloquear la rodilla afectada evita que se doble. Si el paciente se agarra al cuello (B), puede lesionar las cervicales del TCAE y arrastrarlo si se cae."},
+{t:"Un paciente que no puede colaborar debe pasar de la cama a una camilla. ¿Cuál es el procedimiento correcto?",o:["Una sola persona, con la camilla colocada en perpendicular a la cama.","La camilla pegada y en paralelo a la cama, a la misma altura, las dos frenadas, y varias personas (al menos 2 o 3) moviendo al paciente con la entremetida, de forma coordinada.","La camilla más baja que la cama, para que el paciente se deslice por gravedad.","Sin frenos, para poder acercar la camilla durante el movimiento."],a:1,j:"Con las dos superficies a la misma altura, juntas y frenadas, el paciente se desliza sin caídas ni saltos. Si no colabora, hacen falta varias personas que tiren a la vez de la entremetida, o una tabla de transferencia o una grúa. Una sola persona (A) se expone a lesionarse. Los desniveles (C) y la falta de frenos (D) provocan caídas."},
+{t:"Durante el traslado de un paciente en camilla, ¿qué es correcto?",o:["En llano se avanza con los pies del paciente por delante. Al subir una rampa, va delante la cabeza; al bajarla, van delante los pies, para que la cabeza quede siempre más alta. El TCAE situado en la cabecera vigila al paciente.","Siempre con la cabeza por delante.","Al bajar una rampa, con la cabeza por delante.","Al subir una rampa, con los pies por delante."],a:0,j:"En llano, con los pies por delante, el paciente ve hacia dónde va y el TCAE de la cabecera ve su cara. En las rampas, la cabeza siempre más alta que los pies: al subir, la cabeza delante; al bajar, los pies delante. Así se evita que la sangre se acumule en la cabeza y que el paciente se deslice. C y D invierten la regla."},
+{t:"¿Cómo se baja una rampa con un paciente en silla de ruedas?",o:["De frente y deprisa.","De frente, frenando con las manos.","Marcha atrás, de espaldas a la pendiente, con el TCAE detrás controlando la silla. En las paradas se ponen los frenos y los pies van en los reposapiés.","Inclinando la silla hacia delante."],a:2,j:"Si se baja de frente (A, B, D), el paciente puede caer hacia delante y salir de la silla. Bajando marcha atrás, el respaldo sujeta al paciente y el TCAE controla la velocidad con su cuerpo. Las rampas se suben de frente. Frenos en las paradas y pies en los reposapiés evitan caídas y lesiones."},
+{t:"El TCAE ayuda a caminar a un paciente con debilidad en la pierna derecha. Durante el paseo, el paciente empieza a desplomarse. ¿Qué es lo correcto?",o:["El TCAE se coloca en el lado sano, por delante del paciente.","El TCAE lo sujeta con fuerza por un brazo para mantenerlo de pie.","El TCAE lo suelta para no lesionarse.","El TCAE camina en el lado afectado, un poco por detrás, sujetándolo por la cintura o con un cinturón de marcha. Si se cae, lo acompaña hasta el suelo deslizándolo junto a su cuerpo, le protege la cabeza y pide ayuda."],a:3,j:"El TCAE se pone en el lado afectado, hacia donde el paciente tiende a caer, y un poco por detrás. Si empieza a caer, sujetarlo a la fuerza (B) puede lesionar su hombro y la espalda del TCAE. Lo correcto es acompañarlo al suelo de forma controlada, protegiendo la cabeza. Soltarlo (C) lo deja caer sin control."},
+{t:"Un paciente con artrosis en la rodilla izquierda usa bastón. ¿En qué mano lo lleva y cómo lo mueve?",o:["En la mano izquierda, y lo adelanta a la vez que la pierna derecha.","En la mano derecha (lado sano), y lo adelanta a la vez que la pierna izquierda (la afectada).","En la mano derecha, y lo adelanta a la vez que la pierna derecha.","En cualquier mano; da igual."],a:1,j:"El bastón se lleva en la mano del lado contrario a la pierna afectada, es decir, del lado sano, y se adelanta a la vez que la pierna afectada para repartir el peso entre los dos apoyos. Llevarlo en el mismo lado de la pierna afectada (A) es el error más frecuente y hace que el paciente cojee más."},
+{t:"El mismo paciente tiene que subir y bajar escaleras con el bastón. ¿Cuál es la secuencia correcta?",o:["Para subir: primero la pierna sana y después la afectada junto con el bastón. Para bajar: primero el bastón con la pierna afectada y después la sana.","Para subir: primero la pierna afectada.","Para bajar: primero la pierna sana.","Es igual en los dos sentidos."],a:0,j:"Para subir, la pierna sana tiene fuerza para elevar el cuerpo y va primero. Para bajar, la pierna afectada y el bastón bajan primero, y la sana sostiene el peso mientras tanto. Regla para recordarlo: «lo bueno sube al cielo, lo malo baja al infierno». B y C invierten la secuencia."},
+{t:"¿Cómo se ajusta correctamente una muleta axilar?",o:["La almohadilla se apoya en la axila para cargar el peso del cuerpo.","La muleta tan alta que el paciente tenga que encoger los hombros.","La almohadilla queda unos 3-4 dedos (unos 5 cm) por debajo de la axila, y la empuñadura a una altura que permita llevar el codo ligeramente flexionado, unos 15-30°. El peso se apoya en las manos, no en las axilas.","La empuñadura a una altura que obligue a llevar el codo totalmente estirado."],a:2,j:"Si el peso se apoya en la axila (A, B), se comprimen los nervios del brazo (plexo braquial y nervio radial) y puede aparecer la llamada parálisis de las muletas. Por eso se deja un espacio de unos 3-4 dedos entre la almohadilla y la axila (la distancia varía ligeramente según el manual) y el peso se carga en las manos con el codo un poco flexionado. Con el codo totalmente estirado (D), el paciente no puede empujar bien."},
+{t:"¿Cómo se usa correctamente un andador sin ruedas?",o:["Se usa también para subir escaleras.","Se empuja arrastrándolo, sin levantarlo.","Se adelanta un metro o más en cada paso.","Se levanta y se adelanta una distancia corta, más o menos un paso; se apoya con las cuatro patas; luego se adelanta primero la pierna afectada y después la sana, sin salir del espacio del andador."],a:3,j:"El andador da estabilidad solo cuando apoya sus cuatro patas. Por eso se adelanta poco, se apoya y después avanza el paciente: primero la pierna afectada, luego la sana. Si se adelanta demasiado (C), el paciente se inclina y puede perder el equilibrio. Arrastrar un andador sin ruedas (B) lo desestabiliza. El andador no se usa en escaleras (A)."},
+{t:"¿Qué conjunto de medidas previene correctamente las caídas del paciente?",o:["Calzado abierto tipo chancla y suelo recién fregado para que esté limpio.","Cama en posición baja y frenada, timbre y objetos personales a su alcance, calzado cerrado y antideslizante, buena iluminación, suelo seco y barandillas según la valoración del paciente.","Mantener la cama elevada para trabajar más cómodo.","Dejar el timbre fuera de su alcance para que no llame tanto."],a:1,j:"Las caídas se previenen controlando el entorno (iluminación, suelo seco, objetos y timbre al alcance), la cama (baja y frenada) y el calzado (cerrado y antideslizante). Las barandillas se ponen según la valoración de cada paciente. La cama se sube solo durante el procedimiento y después se vuelve a bajar (C). A y D aumentan el riesgo de caída."},
+{t:"¿Qué principio de mecánica corporal debe seguir el TCAE para proteger su espalda?",o:["Separar los pies, con uno un poco adelantado, para tener una base amplia; flexionar las rodillas con la espalda recta; mantener la carga cerca del cuerpo; y girar moviendo los pies, no el tronco.","Doblar la espalda y mantener las piernas rectas.","Mantener la carga lejos del cuerpo para tener más control.","Girar el tronco mientras se sostiene la carga."],a:0,j:"Una base amplia da estabilidad. Flexionando las rodillas con la espalda recta, el esfuerzo lo hacen las piernas, más fuertes que los músculos de la espalda (B es incorrecta). Con la carga cerca del cuerpo, la columna soporta menos esfuerzo (C). Girar el tronco con peso (D) es uno de los mecanismos más frecuentes de lesión lumbar. También ayuda poner la cama a la altura de la cintura y empujar o tirar en lugar de levantar."},
+{t:"El TCAE está solo en el turno de noche. Un paciente de 110 kg que no puede colaborar tiene que pasar al sillón. ¿Qué debe hacer?",o:["Hacerlo solo para no molestar a los compañeros.","Dejar al paciente en la cama sin registrarlo.","No hacerlo solo: pedir ayuda a otro compañero o usar una ayuda mecánica, como la grúa, planificar el movimiento y explicárselo al paciente.","Arrastrarlo con la sábana hasta el sillón."],a:2,j:"Mover solo a un paciente pesado que no colabora (A) pone en riesgo al paciente, que puede caerse, y al TCAE, que puede lesionarse la espalda. Lo correcto es pedir ayuda o usar ayudas mecánicas (grúa, tabla de transferencia), planificar el movimiento y explicarlo al paciente. Si no puede hacerse con seguridad, se aplaza y se comunica y registra, lo que no se hace en B. Arrastrarlo (D) daña su piel."}
+];
+const L=["A","B","C","D"];
+const state={ans:Array(30).fill(null),mode:"exam",pen:true,graded:false};
+const $=s=>document.querySelector(s);
+const quiz=$("#quiz");
+
+function render(){
+  let h="";
+  BLOCKS.forEach(b=>{
+    h+=`<div class="block-h">${b.name}</div>`;
+    for(let i=b.from-1;i<b.to;i++){
+      const q=Q[i];
+      h+=`<article class="q" id="q${i+1}"><div class="q-num">Pregunta ${i+1} de 30</div><p class="q-text">${q.t}</p><div class="opts" role="group" aria-label="Opciones de la pregunta ${i+1}">`;
+      q.o.forEach((o,k)=>{h+=`<button type="button" class="opt" id="q${i+1}o${k}" data-q="${i}" data-k="${k}"><span class="k">${L[k]}</span><span class="tx">${o}</span></button>`});
+      h+=`</div><div class="q-foot"><button type="button" class="linkbtn" data-clear="${i}">Dejar en blanco</button></div><div class="fb" id="fb${i}" hidden></div></article>`;
+    }
+  });
+  quiz.innerHTML=h;
+}
+function revealed(i){return state.graded||(state.mode==="study"&&state.ans[i]!==null)}
+function paint(i){
+  const q=Q[i],a=state.ans[i],show=revealed(i);
+  q.o.forEach((_,k)=>{
+    const b=document.getElementById(`q${i+1}o${k}`);
+    b.className="opt";
+    if(show){
+      if(k===q.a)b.classList.add("right");
+      else if(k===a)b.classList.add("wrong");
+      b.disabled=true;
+    }else{
+      if(k===a)b.classList.add("sel");
+      b.disabled=false;
+    }
+    b.setAttribute("aria-pressed",k===a?"true":"false");
+  });
+  const clr=document.querySelector(`[data-clear="${i}"]`);
+  clr.hidden=show||a===null;
+  const fb=document.getElementById("fb"+i);
+  if(show){
+    let cls,v;
+    if(a===null){cls="blank";v=`En blanco. La respuesta correcta es la ${L[q.a]}.`}
+    else if(a===q.a){cls="ok";v=`Correcta: ${L[q.a]}.`}
+    else{cls="bad";v=`Incorrecta. Marcaste la ${L[a]}; la correcta es la ${L[q.a]}.`}
+    fb.className="fb "+cls;
+    fb.innerHTML=`<span class="v">${v}</span>${q.j}`;
+    fb.hidden=false;
+  }else fb.hidden=true;
+}
+function paintAll(){for(let i=0;i<30;i++)paint(i);progress()}
+function progress(){
+  const n=state.ans.filter(x=>x!==null).length;
+  $("#counter").textContent=`${n}/30 respondidas`;
+  $("#barfill").style.width=(n/30*100)+"%";
+}
+function setPressed(on,off){on.setAttribute("aria-pressed","true");off.setAttribute("aria-pressed","false")}
+
+quiz.addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&!o.disabled){state.ans[+o.dataset.q]=+o.dataset.k;paint(+o.dataset.q);progress();if(state.graded)grade(false);return}
+  const c=e.target.closest("[data-clear]");
+  if(c){state.ans[+c.dataset.clear]=null;paint(+c.dataset.clear);progress()}
+});
+$("#m-exam").onclick=()=>{state.mode="exam";setPressed($("#m-exam"),$("#m-study"));$("#modehint").textContent="Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».";paintAll()};
+$("#m-study").onclick=()=>{state.mode="study";setPressed($("#m-study"),$("#m-exam"));$("#modehint").textContent="Modo estudio: al responder cada pregunta ves enseguida si es correcta y su justificación.";paintAll()};
+$("#p-on").onclick=()=>{state.pen=true;setPressed($("#p-on"),$("#p-off"));if(state.graded)grade(false)};
+$("#p-off").onclick=()=>{state.pen=false;setPressed($("#p-off"),$("#p-on"));if(state.graded)grade(false)};
+$("#grade").onclick=()=>grade(true);
+$("#reset").onclick=()=>{
+  state.ans=Array(30).fill(null);state.graded=false;
+  $("#results").hidden=true;$("#grade").textContent="Corregir examen";
+  paintAll();window.scrollTo({top:0,behavior:"smooth"});
+};
+
+function fmt(x){return x.toFixed(2).replace(".",",")}
+function grade(scroll){
+  state.graded=true;paintAll();
+  let ok=0,bad=0,blank=0;
+  state.ans.forEach((a,i)=>{if(a===null)blank++;else if(a===Q[i].a)ok++;else bad++});
+  const net=state.pen?Math.max(0,ok-bad/3):ok;
+  const nota=net*10/30;
+  const pass=nota>=5;
+  let rows="";
+  BLOCKS.forEach(b=>{
+    let c=0,t=b.to-b.from+1;
+    for(let i=b.from-1;i<b.to;i++)if(state.ans[i]===Q[i].a)c++;
+    rows+=`<tr><td>${b.name}</td><td class="num">${b.from}–${b.to}</td><td class="num">${c}/${t}</td><td><div class="mini"><i style="width:${c/t*100}%"></i></div></td></tr>`;
+  });
+  const fails=[];state.ans.forEach((a,i)=>{if(a!==Q[i].a)fails.push(i+1)});
+  const formula=state.pen
+    ?`[${ok} − (${bad} ÷ 3)] × (10 ÷ 30) = ${fmt(nota)}`
+    :`${ok} × (10 ÷ 30) = ${fmt(nota)}`;
+  $("#results").innerHTML=`
+    <div class="eyebrow">Resultado</div>
+    <h2>Tu nota en el simulacro</h2>
+    <div class="score"><span class="n">${fmt(nota)}</span><span class="of">sobre 10</span><span class="pill ${pass?"pass":"fail"}">${pass?"Aprobado":"Suspenso"}</span></div>
+    <div class="tally"><div><span>Aciertos</span><b>${ok}</b></div><div><span>Errores</span><b>${bad}</b></div><div><span>En blanco</span><b>${blank}</b></div></div>
+    <div class="formula">${formula}</div>
+    ${fails.length?`<p class="note">Repasa las preguntas: ${fails.map(n=>`<a href="#q${n}">${n}</a>`).join(", ")}.</p>`:`<p class="note">Sin fallos ni preguntas en blanco.</p>`}
+    <h3>Aciertos por bloque</h3>
+    <div class="tbl-wrap"><table><thead><tr><th>Bloque</th><th>Preguntas</th><th>Aciertos</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3>Cómo se calcula la nota</h3>
+    <p>Con penalización, cada error resta un tercio de acierto y las preguntas en blanco no cuentan. Para un 5 necesitas 15 puntos netos. No existe una fórmula única para todas las pruebas libres: consulta los criterios de calificación que publica el centro donde te examines.</p>
+    <p>Estrategia: si se penalizan los errores, responde solo cuando puedas descartar al menos dos opciones con seguridad. Si no se penalizan, contesta todas.</p>
+    <h3>Lo que más se pregunta</h3>
+    <ul class="tips">
+      <li>Clasificación de los huesos por su forma. Las falanges son huesos largos y la rótula es un sesamoideo.</li>
+      <li>Partes del hueso largo: el periostio no cubre las superficies articulares y el hueso crece en longitud en el cartílago de crecimiento.</li>
+      <li>Cada posición con su uso: Fowler para la disnea, Sims izquierda para el enema, litotomía para el sondaje femenino, anti-Trendelenburg para el reflujo.</li>
+      <li>Contraindicaciones de Trendelenburg: traumatismo craneal, aumento de la presión intracraneal y dificultad respiratoria.</li>
+      <li>Puntos de apoyo de cada decúbito.</li>
+      <li>Movilización: desplazar al paciente antes de girarlo; en la hemiplejía, el sillón va en el lado sano.</li>
+      <li>Traslados: en las rampas, la cabeza siempre más alta; la silla de ruedas baja las rampas marcha atrás.</li>
+      <li>Bastón en la mano del lado sano. En escaleras, la pierna sana sube primero y la afectada baja primero.</li>
+      <li>Muletas: el peso nunca se apoya en la axila.</li>
+      <li>Ergonomía y límites del TCAE: pedir ayuda o usar la grúa antes que arriesgarse.</li>
+    </ul>`;
+  $("#results").hidden=false;
+  $("#grade").textContent="Recalcular nota";
+  if(scroll)$("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+render();paintAll();
+</script>
+
+</html>

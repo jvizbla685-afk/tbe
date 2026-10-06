@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 4. Úlceras por presión y contenido adicional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: hoja de examen en una columna; cabecera fija con progreso; resultados al final */
+:root{
+  --bg:#f3f6f7; --paper:#ffffff; --ink:#15262e; --muted:#5a6d75; --line:#d5dfe2;
+  --accent:#0d6e66; --accent-soft:#dcefec;
+  --ok:#1d7a3a; --ok-soft:#e3f3e7; --bad:#b4332d; --bad-soft:#fbe6e4; --blank:#8a6a12; --blank-soft:#fbf2d9;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top-in .t{font:700 15px/1.2 var(--display);flex:1 1 200px;min-width:0}
+.counter{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex:1 1 100%}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.intro{padding-block:36px 8px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(30px,6vw,44px)/1.08 var(--display);margin:.25em 0 .35em;text-wrap:balance}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;padding:0;list-style:none;font-size:15px}
+.meta b{font-family:var(--mono);font-weight:500}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0 8px;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.controls .lbl{font-weight:700;font-size:15px;margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--paper)}
+.controls .hint{flex:1 1 100%;font-size:14px;color:var(--muted);margin:0}
+.block-h{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+.block-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;margin-bottom:16px;scroll-margin-top:90px}
+.q-num{font:500 13px var(--mono);color:var(--accent)}
+.q-text{font-weight:600;margin:6px 0 14px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:500 13px var(--mono)}
+.opt .tx{min-width:0}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .k{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:var(--paper);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.q-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.linkbtn{background:none;border:0;color:var(--muted);font:600 14px var(--body);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15.5px}
+.fb.ok{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)} .fb.blank{background:var(--blank-soft)}
+.fb .v{font-weight:700;display:block;margin-bottom:4px}
+.fb.ok .v{color:var(--ok)} .fb.bad .v{color:var(--bad)} .fb.blank .v{color:var(--blank)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
+.btn{font:700 16px var(--body);border-radius:8px;padding:12px 20px;cursor:pointer;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#results{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px 20px;margin-top:8px;scroll-margin-top:80px}
+#results h2{font:700 26px/1.15 var(--display);margin:0 0 4px}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin:12px 0 18px}
+.score .n{font:700 64px/1 var(--display);font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted);font-family:var(--mono);font-size:15px}
+.pill{display:inline-block;font:700 13px var(--body);padding:4px 10px;border-radius:999px}
+.pill.pass{background:var(--ok-soft);color:var(--ok)} .pill.fail{background:var(--bad-soft);color:var(--bad)}
+.tally{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.tally div{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tally span{display:block;font-size:13px;color:var(--muted)}
+.tally b{font:500 22px var(--mono);font-variant-numeric:tabular-nums}
+.formula{font-family:var(--mono);font-size:14px;background:var(--bg);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini{height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:70px}
+.mini i{display:block;height:100%;background:var(--accent)}
+.tips{margin:20px 0 0;padding-left:20px}
+.tips li{margin-bottom:6px}
+h3{font:700 18px var(--display);margin:24px 0 8px}
+.note{font-size:14px;color:var(--muted);margin-top:16px}
+footer{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
+@media (max-width:480px){.q{padding:16px 14px}.tally{grid-template-columns:1fr 1fr 1fr}.score .n{font-size:52px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <span class="t">Tema 4 · 30 preguntas</span>
+  <span class="counter" id="counter">0/30 respondidas</span>
+  <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">Pruebas libres · Técnico en Cuidados Auxiliares de Enfermería</div>
+    <h1>Tema 4. Úlceras por presión y contenido adicional</h1>
+    <p class="lead">Simulacro tipo test con casos prácticos y preguntas trampa. Elige una respuesta en cada pregunta. Puedes dejar preguntas en blanco: no suman ni restan.</p>
+    <ul class="meta">
+      <li><b>30</b> preguntas</li>
+      <li><b>4</b> opciones, una correcta</li>
+      <li>Tiempo orientativo: <b>45 min</b></li>
+    </ul>
+  </section>
+
+  <div class="controls" role="group" aria-label="Opciones del simulacro">
+    <span class="lbl">Modo</span>
+    <div class="seg">
+      <button type="button" id="m-exam" aria-pressed="true">Examen</button>
+      <button type="button" id="m-study" aria-pressed="false">Estudio</button>
+    </div>
+    <span class="lbl" style="margin-left:8px">Penalización</span>
+    <div class="seg">
+      <button type="button" id="p-on" aria-pressed="true">−1/3 por error</button>
+      <button type="button" id="p-off" aria-pressed="false">Sin penalizar</button>
+    </div>
+    <p class="hint" id="modehint">Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».</p>
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="actions">
+    <button type="button" class="btn primary" id="grade">Corregir examen</button>
+    <button type="button" class="btn ghost" id="reset">Empezar de nuevo</button>
+  </div>
+
+  <section id="results" hidden></section>
+
+</main>
+
+<script>
+const BLOCKS=[
+  {name:"Concepto y mecanismos de producción",from:1,to:4},
+  {name:"Factores de riesgo",from:5,to:8},
+  {name:"Localizaciones según la posición",from:9,to:13},
+  {name:"Clasificación por grados",from:14,to:17},
+  {name:"Valoración del riesgo y escala de Norton",from:18,to:21},
+  {name:"Medidas de prevención",from:22,to:28},
+  {name:"Nutrición, cuidados básicos y tratamiento",from:29,to:30}
+];
+const Q=[
+{t:"¿Cuál es la definición correcta de úlcera por presión?",o:["Una lesión causada solo por la humedad de la incontinencia.","Una lesión localizada en la piel o en el tejido de debajo, generalmente sobre una prominencia ósea, causada por la presión o por la presión combinada con cizalla.","Una herida infecciosa producida por bacterias en pacientes encamados.","Una quemadura provocada por el calor del colchón."],a:1,j:"La causa principal de una UPP es la presión, sola o junto con la cizalla: deja sin riego (isquemia) el tejido aplastado entre el hueso y la superficie de apoyo. La humedad (A) es un factor de riesgo, no la causa; las lesiones causadas solo por humedad se consideran hoy otro tipo de lesión (dermatitis asociada a la incontinencia). La infección (C) puede ser una complicación, pero no define la UPP."},
+{t:"Sobre cómo actúa la presión en la formación de una UPP, ¿qué afirmación es correcta?",o:["Solo las presiones muy altas producen úlceras.","La lesión aparece siempre a las 24 horas de presión.","La presión no causa daño si la piel está bien hidratada.","Cuando la presión supera la de los capilares, la zona se queda sin riego (isquemia). Una presión baja durante mucho tiempo puede dañar tanto como una presión alta durante poco tiempo."],a:3,j:"Si la presión externa supera la de los capilares (la cifra clásica de los manuales es de unos 32 mmHg), la sangre deja de llegar y los tejidos se dañan. Lo que importa es la combinación de intensidad y tiempo: por eso una presión moderada pero mantenida es peligrosa y existen los cambios posturales. A y B ignoran el tiempo. Hidratar la piel (C) ayuda, pero no impide la isquemia."},
+{t:"Un paciente está en Fowler con la cabecera a 60° y se va deslizando hacia los pies de la cama. La piel del sacro se queda pegada a la sábana mientras el esqueleto baja. ¿Qué mecanismo de lesión se está produciendo?",o:["Cizalla.","Fricción.","Solo presión directa.","Humedad."],a:0,j:"En la cizalla, la piel se queda fija y las capas profundas se desplazan con el hueso, lo que estira y rompe los vasos de los tejidos profundos. Es típica con la cabecera muy elevada. La fricción (B) es el roce de la superficie de la piel con la sábana, por ejemplo al arrastrar al paciente. Para prevenir la cizalla, la cabecera no debe superar los 30°, salvo indicación."},
+{t:"Para subir a un paciente hacia la cabecera, un compañero lo arrastra sobre la sábana. Después aparecen erosiones superficiales en los codos y los talones. ¿Cuál es el mecanismo principal y cómo se previene?",o:["Cizalla; se previene elevando la cabecera.","Presión; se previene masajeando la zona.","Fricción; se previene moviendo al paciente sin arrastrarlo (levantándolo con la entremetida o con la grúa) y protegiendo la piel.","Humedad; se previene aplicando talco."],a:2,j:"La fricción es el roce entre la piel y la superficie de apoyo, y produce lesiones superficiales. Se evita levantando al paciente en lugar de arrastrarlo, con la entremetida o la grúa y con ayuda si hace falta. Elevar la cabecera (A) aumenta la cizalla. El masaje (B) está contraindicado. El talco (D) no protege del roce."},
+{t:"¿Cuál de estos es un factor de riesgo extrínseco de UPP?",o:["La desnutrición.","Las arrugas en las sábanas y la presión de una sonda nasogástrica.","La edad avanzada.","La alteración del nivel de conciencia."],a:1,j:"Los factores intrínsecos dependen del propio paciente: inmovilidad, edad, desnutrición, deshidratación, nivel de conciencia, sensibilidad o mala circulación. Los extrínsecos dependen del entorno o de los cuidados: humedad, arrugas o restos en la cama, dispositivos médicos (sondas, mascarillas, férulas), superficie inadecuada o mala técnica de movilización. A, C y D son intrínsecos."},
+{t:"Un paciente con una lesión medular no tiene sensibilidad en las piernas. ¿Por qué tiene más riesgo de UPP?",o:["Porque no nota la molestia que causa la presión prolongada y no cambia de postura por sí mismo. Son factores intrínsecos: falta de sensibilidad e inmovilidad.","Porque tiene un factor extrínseco.","Porque solo tiene riesgo en la espalda.","No tiene más riesgo si está en un colchón especial."],a:0,j:"Una persona sana nota la molestia de la presión y se mueve sin darse cuenta. Sin sensibilidad, esa señal no llega y, junto con la inmovilidad (el factor de riesgo más importante), el paciente mantiene la presión durante horas. Ambos factores son intrínsecos (B es incorrecta). El riesgo aparece en cualquier zona de apoyo (C). Un colchón especial reduce el riesgo, pero no lo elimina (D)."},
+{t:"Un paciente tiene incontinencia urinaria y fecal. ¿Cómo influye en el riesgo de UPP y qué debe hacer el TCAE?",o:["La humedad protege la piel del roce.","Solo la orina daña la piel; las heces no.","Basta con cambiar el absorbente una vez al día.","La humedad reblandece la piel (maceración) y la hace menos resistente a la presión y al roce, y la mezcla de orina y heces es más irritante. Hay que cambiar el absorbente con frecuencia, lavar, secar y aplicar un producto barrera."],a:3,j:"La piel macerada se rompe con más facilidad, y las enzimas de las heces mezcladas con la orina irritan mucho la piel. Por eso el absorbente se cambia cada vez que está sucio, se lava con jabón neutro, se seca sin frotar y se aplican los productos barrera que indique el protocolo."},
+{t:"Un paciente está desnutrido y deshidratado. ¿Por qué tiene más riesgo de UPP?",o:["Porque tiene más tejido graso.","La nutrición solo influye en la curación, no en la aparición de la úlcera.","Porque la falta de proteínas y de líquidos hace la piel más frágil, reduce el tejido que amortigua sobre los huesos, favorece los edemas y empeora la cicatrización.","La nutrición no tiene relación con las UPP."],a:2,j:"Sin suficientes proteínas, el paciente pierde masa muscular y grasa, y los huesos quedan más expuestos; además aparecen edemas, y el tejido con edema recibe peor el oxígeno. La deshidratación deja la piel seca y poco elástica. La nutrición influye tanto en la aparición como en la curación (B es incorrecta)."},
+{t:"¿Cuál es la localización más frecuente de las úlceras por presión?",o:["El sacro.","El occipital.","La oreja.","Los maléolos."],a:0,j:"El sacro soporta mucho peso tanto boca arriba como semisentado, y en él coinciden presión, cizalla y humedad de la incontinencia. Los talones son la segunda localización más frecuente. Occipital, oreja y maléolos son zonas de riesgo, pero menos frecuentes."},
+{t:"Un paciente pasa muchas horas sentado en un sillón. ¿Qué zona tiene el máximo riesgo?",o:["El trocánter.","Los isquiones (los huesos de las nalgas sobre los que nos sentamos).","El occipital.","Las crestas ilíacas."],a:1,j:"Sentado, casi todo el peso cae sobre los isquiones, y en menor medida sobre sacro, cóccix, omóplatos y talones. Es una trampa: si respondes «sacro» por costumbre, fallas. El trocánter (A) es zona de riesgo de la posición de lado; las crestas ilíacas (D), de la posición boca abajo."},
+{t:"¿Qué zona NO es de riesgo en la posición de lado (decúbito lateral)?",o:["El trocánter mayor.","El maléolo.","El sacro.","El pabellón de la oreja."],a:2,j:"De lado, las zonas de apoyo son oreja, hombro, costillas, trocánter, cara interna o externa de la rodilla y maléolos. El sacro es zona de riesgo boca arriba, semisentado y sentado. Por eso la posición de lado con una inclinación de unos 30° protege a la vez el sacro y el trocánter."},
+{t:"¿Cuáles son las zonas de riesgo en la posición boca abajo (decúbito prono)?",o:["El sacro y los talones.","El occipital y los omóplatos.","Los isquiones.","La frente y las mejillas, las orejas, las mamas, los genitales masculinos, las crestas ilíacas, las rodillas y los dedos de los pies."],a:3,j:"Boca abajo, el cuerpo se apoya en su cara anterior: cara, orejas, mamas, genitales masculinos, crestas ilíacas, rodillas y dedos de los pies. Una almohada bajo las piernas evita que los dedos apoyen en la cama. A y B son de la posición boca arriba; C, de la posición sentada."},
+{t:"Un paciente lleva sonda nasogástrica y gafas nasales de oxígeno. ¿Qué zonas debe vigilar especialmente el TCAE?",o:["Ninguna, porque los dispositivos médicos no producen UPP.","El ala de la nariz, por la sonda, y las orejas, por las gafas. Debe vigilar la piel debajo de los dispositivos, protegerla según el protocolo y comunicar cualquier enrojecimiento.","Solo el sacro.","El abdomen."],a:1,j:"Los dispositivos médicos (sondas, gafas de oxígeno, mascarillas, férulas, sujeciones) presionan siempre sobre el mismo punto y producen UPP aunque no haya prominencia ósea. Es un factor extrínseco. Hay que revisar la piel bajo cada dispositivo y comunicar cualquier alteración a enfermería."},
+{t:"Durante el aseo, el TCAE ve en el sacro una zona enrojecida que no se vuelve blanca al presionarla con el dedo. La piel está intacta y la zona está algo caliente. ¿Qué es?",o:["Una UPP de grado I.","Una UPP de grado II.","Piel sana; es un enrojecimiento normal después de estar apoyado.","Una UPP de grado III."],a:0,j:"El grado I es un enrojecimiento que no se vuelve blanco al presionarlo, con la piel intacta; puede acompañarse de calor, edema o endurecimiento. Si la zona sí se vuelve blanca (C), es un enrojecimiento pasajero. En el grado II (B) ya se ha perdido parte de la piel. El TCAE quita la presión de la zona, no la masajea, y lo comunica y registra."},
+{t:"En el talón de un paciente hay una ampolla con líquido transparente, o una erosión superficial que afecta a la epidermis y a la dermis, sin que se vea la grasa de debajo. ¿Qué grado es?",o:["Grado I.","Grado III.","Grado II.","Grado IV."],a:2,j:"El grado II es una pérdida parcial del grosor de la piel (epidermis y parte de la dermis): ampolla, erosión o úlcera poco profunda. En el grado I (A) la piel sigue intacta. En el grado III (B) se pierde todo el grosor de la piel y se ve la grasa de debajo. El TCAE no pincha la ampolla: protege la zona y lo comunica."},
+{t:"En el sacro hay una lesión profunda con tejido muerto (necrótico) en la que se ven el hueso y los tendones. ¿Qué grado es?",o:["Grado III.","Grado II.","Grado I.","Grado IV."],a:3,j:"El grado IV es una pérdida total del grosor de la piel con destrucción profunda: se ven músculo, hueso o tendones, y puede haber tejido necrótico y cavidades. En el grado III (A) se ve la grasa de debajo de la piel, pero no hueso, tendón ni músculo. La trampa típica: si se ve hueso, ya es grado IV."},
+{t:"Un paciente tiene la piel muy oscura y un enrojecimiento podría no verse. ¿Cómo se detecta una UPP de grado I?",o:["Si no hay enrojecimiento visible, no hay lesión.","Comparando la zona con la piel de alrededor: cambios de color (más oscura o violácea), de temperatura (más caliente o más fría), de consistencia (más dura o más blanda), edema y dolor.","Esperando a que salga una ampolla para confirmarlo.","Masajeando la zona para ver si se enrojece."],a:1,j:"En la piel oscura el enrojecimiento puede no verse, así que hay que fijarse en color, temperatura, consistencia, edema y dolor, comparando siempre con la piel de alrededor. Esperar a la ampolla (C) supone dejar que la lesión avance a grado II. Masajear (D) daña el tejido."},
+{t:"¿Qué parámetro NO forma parte de la escala de Norton?",o:["Estado mental.","Incontinencia.","Percepción sensorial.","Movilidad."],a:2,j:"Norton valora 5 parámetros: estado físico general, estado mental, actividad, movilidad e incontinencia. La percepción sensorial es un parámetro de la escala de Braden, que también incluye humedad, nutrición y fricción. Es una trampa frecuente: mezclar los parámetros de las dos escalas."},
+{t:"Sobre la escala de Norton, ¿qué afirmación es correcta?",o:["Tiene 5 parámetros puntuados de 1 a 4, con un total entre 5 y 20. Cuanto menor es la puntuación, mayor es el riesgo, y una puntuación de 14 o menos indica riesgo.","Cuanto mayor es la puntuación, mayor es el riesgo.","Se aplica una sola vez durante toda la estancia del paciente.","La puntuación total va de 0 a 10."],a:0,j:"En Norton, el 4 es la mejor situación y el 1 la peor; por eso un paciente con muchos problemas suma pocos puntos. B es la trampa principal. Una puntuación de 14 o menos indica riesgo. La valoración se repite a lo largo de la estancia (C)."},
+{t:"Un paciente tiene estas puntuaciones en Norton: estado físico regular (2), estado mental confuso (2), actividad encamado (1), movilidad muy limitada (2) e incontinencia urinaria y fecal (1). ¿Qué puntuación total tiene y qué riesgo indica, según la escala de Norton modificada?",o:["12 puntos; riesgo medio.","8 puntos; sin riesgo.","15 puntos; riesgo mínimo.","8 puntos; riesgo muy alto."],a:3,j:"2 + 2 + 1 + 2 + 1 = 8 puntos. En la Norton modificada: 5-9, riesgo muy alto; 10-12, riesgo alto; 13-14, riesgo medio; más de 14, riesgo mínimo. Los tramos varían un poco según el manual, pero 8 puntos es riesgo muy alto con cualquier criterio. B interpreta la escala al revés; A y C tienen mal la suma."},
+{t:"¿Cuándo hay que valorar el riesgo de UPP?",o:["Solo cuando ya ha aparecido una úlcera.","Al ingreso, de forma periódica, y siempre que cambie la situación del paciente, por ejemplo tras una cirugía o si empeora.","Solo en el momento del alta.","Una sola vez, porque el riesgo no cambia."],a:1,j:"Valorar el riesgo sirve para prevenir, por eso se hace desde el ingreso y se repite: el riesgo cambia con la evolución del paciente. Valorar cuando la úlcera ya ha aparecido (A) llega tarde. El TCAE colabora aportando lo que observa sobre movilidad, incontinencia, ingesta y estado de la piel."},
+{t:"¿Cómo se hacen los cambios posturales a un paciente encamado con alto riesgo de UPP?",o:["Cada 8 horas.","Solo alternando boca arriba y de lado, apoyándolo directamente sobre el trocánter.","Según el plan de cuidados, normalmente cada 2-3 horas, alternando posiciones. De lado, con una inclinación de unos 30°, apoyando la nalga y no el trocánter. Sin arrastrar al paciente y registrando cada cambio.","Solo cuando el paciente lo pida."],a:2,j:"Los cambios posturales reducen el tiempo de presión sobre cada zona. La frecuencia la marca el plan de cuidados según el riesgo; la referencia habitual es cada 2-3 horas. De lado con unos 30° de inclinación, ni el sacro ni el trocánter soportan todo el peso; apoyar sobre el trocánter (B) es peligroso. Esperar a que lo pida (D) no sirve: muchos pacientes no pueden pedirlo o no notan la molestia."},
+{t:"¿Qué cuidados necesita un paciente con riesgo de UPP que está sentado en un sillón?",o:["Limitar el tiempo que pasa sentado, recolocarlo con frecuencia (y, si puede, pedirle que cambie el peso de apoyo cada poco tiempo), con los pies apoyados y la espalda bien apoyada en el respaldo.","Dejarlo toda la mañana sentado sin moverlo.","Ponerle un flotador bajo las nalgas.","Sentarlo resbalado hacia delante en el sillón."],a:0,j:"Sentado, el peso se concentra en una superficie pequeña (los isquiones), así que hay que limitar el tiempo en el sillón y recolocar al paciente más a menudo que en la cama. Los flotadores y rodetes (C) están contraindicados porque concentran la presión en el borde. Sentarlo resbalado (D) produce cizalla en el sacro."},
+{t:"Un paciente encamado tiene riesgo de UPP y no hay ninguna indicación médica especial. ¿A qué altura debe estar la cabecera de la cama?",o:["A 60° durante todo el día.","A 90°.","Siempre horizontal, incluso para comer.","No más de 30°, salvo para comer o por indicación (por ejemplo, problemas respiratorios). Después se vuelve a bajar."],a:3,j:"Con la cabecera por encima de 30° (A, B), el paciente se desliza hacia los pies y aparece la cizalla sobre el sacro. Para comer sí se eleva, porque estar horizontal (C) aumenta el riesgo de atragantamiento; después se vuelve a bajar. Si hay una indicación clínica, como dificultad para respirar, se sigue esa indicación."},
+{t:"¿Cómo se protegen los talones de un paciente encamado con riesgo de UPP?",o:["Poniendo un rodete o flotador bajo cada talón.","Elevando los talones para que queden sin apoyo («flotando»), con una almohada bajo las pantorrillas y la rodilla ligeramente flexionada, y vigilándolos.","Masajeando los talones en cada turno.","Poniendo un guante lleno de agua bajo el talón."],a:1,j:"La mejor protección del talón es eliminar la presión del todo, dejándolo sin apoyo. La almohada va bajo la pantorrilla, no bajo el tendón de Aquiles, y la rodilla ligeramente flexionada evita estirar en exceso la pierna. Los rodetes (A) y los guantes con agua (D) están desaconsejados porque concentran la presión. Masajear (C) está contraindicado."},
+{t:"¿Cuál de estas es una medida correcta de prevención de UPP?",o:["Masajear las prominencias óseas enrojecidas para activar la circulación.","Frotar la piel con alcohol o colonia para endurecerla.","Aplicar ácidos grasos hiperoxigenados sobre las zonas de riesgo con la piel intacta, extendiéndolos con suavidad y sin masaje.","Usar un flotador bajo el sacro."],a:2,j:"Los ácidos grasos hiperoxigenados mejoran la resistencia y la hidratación de la piel en las zonas de riesgo; se aplican sobre piel intacta y sin masajear. El masaje sobre zonas enrojecidas (A) daña los tejidos. El alcohol y la colonia (B) resecan la piel. Los flotadores (D) concentran la presión en el borde."},
+{t:"¿Cómo debe ser la higiene de la piel de un paciente con riesgo de UPP?",o:["Con jabón neutro y agua templada; secar con pequeños toques, sin frotar, sobre todo en los pliegues; e hidratar la piel seca, sin dejar humedad en los pliegues.","Con agua caliente y jabón alcalino, para limpiar mejor.","Con talco abundante para que la piel absorba la humedad.","Secando con energía para activar la circulación."],a:0,j:"El objetivo es una piel limpia, seca e hidratada. El jabón neutro respeta la acidez natural de la piel; secar sin frotar evita la fricción; en los pliegues no debe quedar humedad, porque produce maceración. El agua caliente y el jabón alcalino (B) resecan la piel. El talco (C) forma grumos e irrita. Frotar con energía (D) daña la piel frágil."},
+{t:"Un paciente con alto riesgo de UPP tiene un colchón de aire alternante. ¿Qué afirmación es correcta?",o:["Ya no necesita cambios posturales.","Se le puede dejar 8 horas sin moverlo.","Las superficies especiales solo sirven para que el paciente esté más cómodo.","Las superficies especiales reparten la presión y se eligen según el riesgo (estáticas para riesgo bajo; dinámicas, como el colchón de aire alternante, para riesgo alto), pero no sustituyen a los cambios posturales."],a:3,j:"Las superficies especiales para el manejo de la presión la reducen o redistribuyen, pero no la eliminan. Por eso se siguen haciendo cambios posturales, aunque su frecuencia pueda ajustarse según el plan de cuidados. Esa es la trampa (A, B). Las superficies especiales son una medida de prevención real, no solo de comodidad (C)."},
+{t:"Un paciente con riesgo de UPP solo se come la mitad de cada comida. ¿Qué debe hacer el TCAE?",o:["Retirar la bandeja sin comentar nada.","Ayudarle a comer si lo necesita, ofrecerle líquidos si no tiene restricción, registrar lo que come y comunicarlo a enfermería.","Darle él mismo suplementos de proteínas.","Limitarle los líquidos para que moje menos el absorbente."],a:1,j:"La nutrición y la hidratación son parte esencial de la prevención. El TCAE ayuda al paciente a comer, registra lo que ingiere y comunica los problemas. Los suplementos los indica el equipo sanitario, no el TCAE (C). Limitar los líquidos sin indicación (D) deshidrata al paciente y aumenta el riesgo de UPP."},
+{t:"Sobre los principios generales del tratamiento de las UPP, ¿qué afirmación es correcta?",o:["El TCAE hace las curas de las úlceras de grado III.","Se deja que la úlcera se seque al aire y se limpia con antisépticos de forma rutinaria.","Se elimina la presión sobre la zona, se limpia con suero fisiológico, se retira el tejido muerto, se mantiene un ambiente húmedo en la herida y se controla la infección. La cura la hace enfermería, y el TCAE colabora colocando al paciente, preparando el material, manteniendo la zona sin presión y observando.","Se puede seguir apoyando al paciente sobre la úlcera si el apósito está bien puesto."],a:2,j:"El tratamiento se basa en quitar la presión, limpiar con suero fisiológico, retirar el tejido necrótico (desbridamiento) y mantener una cura en ambiente húmedo, porque la humedad controlada favorece la cicatrización. Las heridas secas (B) cicatrizan peor, y los antisépticos no se usan de rutina porque dañan el tejido que se forma. Las curas no son función del TCAE (A). Apoyar al paciente sobre la úlcera (D) la empeora."}
+];
+const L=["A","B","C","D"];
+const state={ans:Array(30).fill(null),mode:"exam",pen:true,graded:false};
+const $=s=>document.querySelector(s);
+const quiz=$("#quiz");
+
+function render(){
+  let h="";
+  BLOCKS.forEach(b=>{
+    h+=`<div class="block-h">${b.name}</div>`;
+    for(let i=b.from-1;i<b.to;i++){
+      const q=Q[i];
+      h+=`<article class="q" id="q${i+1}"><div class="q-num">Pregunta ${i+1} de 30</div><p class="q-text">${q.t}</p><div class="opts" role="group" aria-label="Opciones de la pregunta ${i+1}">`;
+      q.o.forEach((o,k)=>{h+=`<button type="button" class="opt" id="q${i+1}o${k}" data-q="${i}" data-k="${k}"><span class="k">${L[k]}</span><span class="tx">${o}</span></button>`});
+      h+=`</div><div class="q-foot"><button type="button" class="linkbtn" data-clear="${i}">Dejar en blanco</button></div><div class="fb" id="fb${i}" hidden></div></article>`;
+    }
+  });
+  quiz.innerHTML=h;
+}
+function revealed(i){return state.graded||(state.mode==="study"&&state.ans[i]!==null)}
+function paint(i){
+  const q=Q[i],a=state.ans[i],show=revealed(i);
+  q.o.forEach((_,k)=>{
+    const b=document.getElementById(`q${i+1}o${k}`);
+    b.className="opt";
+    if(show){
+      if(k===q.a)b.classList.add("right");
+      else if(k===a)b.classList.add("wrong");
+      b.disabled=true;
+    }else{
+      if(k===a)b.classList.add("sel");
+      b.disabled=false;
+    }
+    b.setAttribute("aria-pressed",k===a?"true":"false");
+  });
+  const clr=document.querySelector(`[data-clear="${i}"]`);
+  clr.hidden=show||a===null;
+  const fb=document.getElementById("fb"+i);
+  if(show){
+    let cls,v;
+    if(a===null){cls="blank";v=`En blanco. La respuesta correcta es la ${L[q.a]}.`}
+    else if(a===q.a){cls="ok";v=`Correcta: ${L[q.a]}.`}
+    else{cls="bad";v=`Incorrecta. Marcaste la ${L[a]}; la correcta es la ${L[q.a]}.`}
+    fb.className="fb "+cls;
+    fb.innerHTML=`<span class="v">${v}</span>${q.j}`;
+    fb.hidden=false;
+  }else fb.hidden=true;
+}
+function paintAll(){for(let i=0;i<30;i++)paint(i);progress()}
+function progress(){
+  const n=state.ans.filter(x=>x!==null).length;
+  $("#counter").textContent=`${n}/30 respondidas`;
+  $("#barfill").style.width=(n/30*100)+"%";
+}
+function setPressed(on,off){on.setAttribute("aria-pressed","true");off.setAttribute("aria-pressed","false")}
+
+quiz.addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&!o.disabled){state.ans[+o.dataset.q]=+o.dataset.k;paint(+o.dataset.q);progress();if(state.graded)grade(false);return}
+  const c=e.target.closest("[data-clear]");
+  if(c){state.ans[+c.dataset.clear]=null;paint(+c.dataset.clear);progress()}
+});
+$("#m-exam").onclick=()=>{state.mode="exam";setPressed($("#m-exam"),$("#m-study"));$("#modehint").textContent="Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».";paintAll()};
+$("#m-study").onclick=()=>{state.mode="study";setPressed($("#m-study"),$("#m-exam"));$("#modehint").textContent="Modo estudio: al responder cada pregunta ves enseguida si es correcta y su justificación.";paintAll()};
+$("#p-on").onclick=()=>{state.pen=true;setPressed($("#p-on"),$("#p-off"));if(state.graded)grade(false)};
+$("#p-off").onclick=()=>{state.pen=false;setPressed($("#p-off"),$("#p-on"));if(state.graded)grade(false)};
+$("#grade").onclick=()=>grade(true);
+$("#reset").onclick=()=>{
+  state.ans=Array(30).fill(null);state.graded=false;
+  $("#results").hidden=true;$("#grade").textContent="Corregir examen";
+  paintAll();window.scrollTo({top:0,behavior:"smooth"});
+};
+
+function fmt(x){return x.toFixed(2).replace(".",",")}
+function grade(scroll){
+  state.graded=true;paintAll();
+  let ok=0,bad=0,blank=0;
+  state.ans.forEach((a,i)=>{if(a===null)blank++;else if(a===Q[i].a)ok++;else bad++});
+  const net=state.pen?Math.max(0,ok-bad/3):ok;
+  const nota=net*10/30;
+  const pass=nota>=5;
+  let rows="";
+  BLOCKS.forEach(b=>{
+    let c=0,t=b.to-b.from+1;
+    for(let i=b.from-1;i<b.to;i++)if(state.ans[i]===Q[i].a)c++;
+    rows+=`<tr><td>${b.name}</td><td class="num">${b.from}–${b.to}</td><td class="num">${c}/${t}</td><td><div class="mini"><i style="width:${c/t*100}%"></i></div></td></tr>`;
+  });
+  const fails=[];state.ans.forEach((a,i)=>{if(a!==Q[i].a)fails.push(i+1)});
+  const formula=state.pen
+    ?`[${ok} − (${bad} ÷ 3)] × (10 ÷ 30) = ${fmt(nota)}`
+    :`${ok} × (10 ÷ 30) = ${fmt(nota)}`;
+  $("#results").innerHTML=`
+    <div class="eyebrow">Resultado</div>
+    <h2>Tu nota en el simulacro</h2>
+    <div class="score"><span class="n">${fmt(nota)}</span><span class="of">sobre 10</span><span class="pill ${pass?"pass":"fail"}">${pass?"Aprobado":"Suspenso"}</span></div>
+    <div class="tally"><div><span>Aciertos</span><b>${ok}</b></div><div><span>Errores</span><b>${bad}</b></div><div><span>En blanco</span><b>${blank}</b></div></div>
+    <div class="formula">${formula}</div>
+    ${fails.length?`<p class="note">Repasa las preguntas: ${fails.map(n=>`<a href="#q${n}">${n}</a>`).join(", ")}.</p>`:`<p class="note">Sin fallos ni preguntas en blanco.</p>`}
+    <h3>Aciertos por bloque</h3>
+    <div class="tbl-wrap"><table><thead><tr><th>Bloque</th><th>Preguntas</th><th>Aciertos</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3>Cómo se calcula la nota</h3>
+    <p>Con penalización, cada error resta un tercio de acierto y las preguntas en blanco no cuentan. Para un 5 necesitas 15 puntos netos. No existe una fórmula única para todas las pruebas libres: consulta los criterios de calificación que publica el centro donde te examines.</p>
+    <p>Estrategia: si se penalizan los errores, responde solo cuando puedas descartar al menos dos opciones con seguridad. Si no se penalizan, contesta todas.</p>
+    <h3>Lo que más se pregunta</h3>
+    <ul class="tips">
+      <li>Fricción frente a cizalla. La cizalla aparece con la cabecera por encima de 30°; la fricción, al arrastrar al paciente.</li>
+      <li>Factores intrínsecos y extrínsecos. Los dispositivos médicos y las arrugas de la cama son extrínsecos.</li>
+      <li>Zonas de riesgo en cada posición. El sacro es la más frecuente; sentado, los isquiones.</li>
+      <li>Grados: el grado I no se vuelve blanco al presionar; si se ve hueso, es grado IV.</li>
+      <li>Escala de Norton: 5 parámetros, de 5 a 20 puntos. Menos puntos, más riesgo; 14 o menos indica riesgo. La percepción sensorial es de la escala de Braden.</li>
+      <li>Lo que no se hace: masajear, usar flotadores o rodetes, aplicar alcohol o pinchar ampollas.</li>
+      <li>Las superficies especiales no sustituyen a los cambios posturales.</li>
+      <li>Límites del TCAE: observa, previene, registra y comunica. Las curas y los suplementos no le corresponden.</li>
+    </ul>`;
+  $("#results").hidden=false;
+  $("#grade").textContent="Recalcular nota";
+  if(scroll)$("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+render();paintAll();
+</script>
+
+</html>

@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulacro TCAE · Célula, tejidos y anatomía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: hoja de examen en una columna; cabecera fija con progreso; resultados al final */
+:root{
+  --bg:#f3f6f7; --paper:#ffffff; --ink:#15262e; --muted:#5a6d75; --line:#d5dfe2;
+  --accent:#0d6e66; --accent-soft:#dcefec;
+  --ok:#1d7a3a; --ok-soft:#e3f3e7; --bad:#b4332d; --bad-soft:#fbe6e4; --blank:#8a6a12; --blank-soft:#fbf2d9;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top-in .t{font:700 15px/1.2 var(--display);flex:1 1 200px;min-width:0}
+.counter{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex:1 1 100%}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.intro{padding-block:36px 8px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(30px,6vw,44px)/1.08 var(--display);margin:.25em 0 .35em;text-wrap:balance}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;padding:0;list-style:none;font-size:15px}
+.meta b{font-family:var(--mono);font-weight:500}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0 8px;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.controls .lbl{font-weight:700;font-size:15px;margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--paper)}
+.controls .hint{flex:1 1 100%;font-size:14px;color:var(--muted);margin:0}
+.block-h{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+.block-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;margin-bottom:16px;scroll-margin-top:90px}
+.q-num{font:500 13px var(--mono);color:var(--accent)}
+.q-text{font-weight:600;margin:6px 0 14px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:500 13px var(--mono)}
+.opt .tx{min-width:0}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .k{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:var(--paper);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.q-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.linkbtn{background:none;border:0;color:var(--muted);font:600 14px var(--body);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15.5px}
+.fb.ok{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)} .fb.blank{background:var(--blank-soft)}
+.fb .v{font-weight:700;display:block;margin-bottom:4px}
+.fb.ok .v{color:var(--ok)} .fb.bad .v{color:var(--bad)} .fb.blank .v{color:var(--blank)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
+.btn{font:700 16px var(--body);border-radius:8px;padding:12px 20px;cursor:pointer;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#results{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px 20px;margin-top:8px;scroll-margin-top:80px}
+#results h2{font:700 26px/1.15 var(--display);margin:0 0 4px}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin:12px 0 18px}
+.score .n{font:700 64px/1 var(--display);font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted);font-family:var(--mono);font-size:15px}
+.pill{display:inline-block;font:700 13px var(--body);padding:4px 10px;border-radius:999px}
+.pill.pass{background:var(--ok-soft);color:var(--ok)} .pill.fail{background:var(--bad-soft);color:var(--bad)}
+.tally{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.tally div{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tally span{display:block;font-size:13px;color:var(--muted)}
+.tally b{font:500 22px var(--mono);font-variant-numeric:tabular-nums}
+.formula{font-family:var(--mono);font-size:14px;background:var(--bg);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini{height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:70px}
+.mini i{display:block;height:100%;background:var(--accent)}
+.tips{margin:20px 0 0;padding-left:20px}
+.tips li{margin-bottom:6px}
+h3{font:700 18px var(--display);margin:24px 0 8px}
+.note{font-size:14px;color:var(--muted);margin-top:16px}
+footer{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
+@media (max-width:480px){.q{padding:16px 14px}.tally{grid-template-columns:1fr 1fr 1fr}.score .n{font-size:52px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <span class="t">Simulacro TCAE · 30 preguntas</span>
+  <span class="counter" id="counter">0/30 respondidas</span>
+  <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">Pruebas libres · Técnico en Cuidados Auxiliares de Enfermería</div>
+    <h1>La célula, los tejidos y las referencias anatómicas</h1>
+    <p class="lead">Simulacro tipo test con casos prácticos y preguntas trampa. Elige una respuesta en cada pregunta. Puedes dejar preguntas en blanco: no suman ni restan.</p>
+    <ul class="meta">
+      <li><b>30</b> preguntas</li>
+      <li><b>4</b> opciones, una correcta</li>
+      <li>Tiempo orientativo: <b>45 min</b></li>
+    </ul>
+  </section>
+
+  <div class="controls" role="group" aria-label="Opciones del simulacro">
+    <span class="lbl">Modo</span>
+    <div class="seg">
+      <button type="button" id="m-exam" aria-pressed="true">Examen</button>
+      <button type="button" id="m-study" aria-pressed="false">Estudio</button>
+    </div>
+    <span class="lbl" style="margin-left:8px">Penalización</span>
+    <div class="seg">
+      <button type="button" id="p-on" aria-pressed="true">−1/3 por error</button>
+      <button type="button" id="p-off" aria-pressed="false">Sin penalizar</button>
+    </div>
+    <p class="hint" id="modehint">Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».</p>
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="actions">
+    <button type="button" class="btn primary" id="grade">Corregir examen</button>
+    <button type="button" class="btn ghost" id="reset">Empezar de nuevo</button>
+  </div>
+
+  <section id="results" hidden></section>
+
+</main>
+
+<script>
+const BLOCKS=[
+  {name:"Célula, orgánulos y funciones vitales",from:1,to:9},
+  {name:"División celular",from:10,to:11},
+  {name:"Tejidos",from:12,to:20},
+  {name:"Niveles de organización",from:21,to:22},
+  {name:"Posición, términos y planos anatómicos",from:23,to:26},
+  {name:"Cavidades y regiones abdominales",from:27,to:30}
+];
+const Q=[
+{t:"En el laboratorio de microbiología se observa al microscopio electrónico una célula con ADN circular libre en el citoplasma (nucleoide), ribosomas, pared celular y ningún orgánulo rodeado de membrana. ¿Qué tipo de célula es?",o:["Célula eucariota vegetal.","Célula eucariota animal.","Célula procariota.","Célula eucariota de un hongo."],a:2,j:"Lo decisivo es que no hay núcleo con envoltura ni orgánulos membranosos: el ADN está libre en el nucleoide. Eso es propio de las procariotas, como las bacterias. La pared celular despista: también la tienen las células vegetales (A) y las de los hongos (D), pero ambas son eucariotas y tienen núcleo. La célula animal (B) no tiene pared."},
+{t:"Sobre las diferencias entre células procariotas y eucariotas, señala la afirmación FALSA:",o:["Ambos tipos celulares tienen membrana plasmática.","Solo las eucariotas tienen el material genético dentro de una envoltura nuclear.","Las eucariotas tienen sistemas de endomembranas y orgánulos especializados.","Las procariotas carecen de ribosomas, por lo que obtienen sus proteínas del medio."],a:3,j:"Trampa clásica: los ribosomas están en todas las células, procariotas y eucariotas, porque todas necesitan sintetizar proteínas. Solo cambia su tamaño, que es menor en las procariotas. A, B y C son ciertas."},
+{t:"Las fibras del músculo cardíaco trabajan sin descanso y necesitan un aporte continuo de energía. ¿Qué orgánulo tendrán en gran cantidad?",o:["Lisosomas.","Mitocondrias.","Aparato de Golgi.","Vacuolas."],a:1,j:"La mitocondria realiza la respiración celular y obtiene energía en forma de ATP, por eso abunda en las células muy activas. Los lisosomas (A) hacen la digestión intracelular, el Golgi (C) modifica y empaqueta sustancias y las vacuolas (D) almacenan. Ninguno produce energía."},
+{t:"Un hepatocito (célula del hígado) inactiva fármacos y sintetiza lípidos. ¿Qué orgánulo hace principalmente estas funciones?",o:["Retículo endoplasmático liso.","Retículo endoplasmático rugoso.","Ribosomas libres.","Nucléolo."],a:0,j:"El REL no tiene ribosomas adheridos; sintetiza lípidos y detoxifica sustancias como fármacos y alcohol. El RER (B) sintetiza proteínas gracias a sus ribosomas: confundir los dos retículos es la trampa. Los ribosomas libres (C) fabrican proteínas para la propia célula y el nucléolo (D) forma ribosomas."},
+{t:"Una célula plasmática fabrica anticuerpos, que son proteínas que se exportan fuera de la célula. ¿Cuál es el recorrido correcto de estas proteínas?",o:["Aparato de Golgi → RER → vesícula → membrana plasmática.","RER → aparato de Golgi → vesículas de secreción → membrana plasmática (exocitosis).","Lisosoma → RER → membrana plasmática.","Nucléolo → REL → aparato de Golgi → núcleo."],a:1,j:"Las proteínas de exportación se sintetizan en los ribosomas del RER, pasan al Golgi, que las modifica y empaqueta en vesículas de secreción, y estas se funden con la membrana para liberarlas. A invierte el orden. Los lisosomas (C) no intervienen en la secreción y el destino final no es el núcleo (D)."},
+{t:"¿Qué afirmación describe correctamente la membrana plasmática?",o:["Es totalmente permeable y deja pasar cualquier sustancia.","Es una envoltura rígida de celulosa que da forma a la célula.","Es una bicapa de lípidos con proteínas, de permeabilidad selectiva, que regula el intercambio con el medio.","Es una estructura exclusiva de las células eucariotas."],a:2,j:"La membrana es una bicapa de fosfolípidos con proteínas incrustadas (modelo de mosaico fluido) y controla qué entra y qué sale. A contradice esa selectividad. B describe la pared celular vegetal. D es falsa: todas las células tienen membrana plasmática."},
+{t:"¿Cuál es la función principal del nucléolo?",o:["Producir la energía (ATP) que necesita el núcleo.","Hacer la digestión intracelular.","Almacenar glucógeno y lípidos de reserva.","Formar los ribosomas a partir de ARN ribosómico y proteínas."],a:3,j:"El nucléolo es una región densa del núcleo donde se sintetiza el ARN ribosómico y se montan las subunidades de los ribosomas. La energía (A) la producen las mitocondrias, la digestión (B) los lisosomas y las reservas (C) se almacenan en el citoplasma."},
+{t:"¿Qué estructura tiene la célula animal y no tienen las células de las plantas superiores?",o:["Centriolos.","Pared celular.","Cloroplastos.","Mitocondrias."],a:0,j:"Los centriolos forman parte del centrosoma y organizan el huso en la división de la célula animal; las plantas superiores no los tienen. La pared (B) y los cloroplastos (C) son propios de la célula vegetal. Las mitocondrias (D) están en ambas."},
+{t:"Un leucocito detecta sustancias químicas liberadas por unas bacterias y se desplaza hacia ellas. ¿Con qué función vital se relaciona esta capacidad de captar un estímulo y responder?",o:["Nutrición.","Relación.","Reproducción.","Excreción, como cuarta función vital independiente."],a:1,j:"La función de relación consiste en percibir estímulos y elaborar una respuesta, como moverse. Las funciones vitales son tres: nutrición, relación y reproducción. Ingerir después la bacteria sería nutrición (A), pero detectarla y desplazarse no. La excreción (D) forma parte de la nutrición."},
+{t:"Durante la mitosis, ¿en qué fase se colocan los cromosomas en el plano ecuatorial de la célula, unidos a las fibras del huso?",o:["Anafase.","Telofase.","Profase.","Metafase."],a:3,j:"Orden: profase → metafase → anafase → telofase. En la metafase los cromosomas condensados se alinean en la placa ecuatorial. En la profase (C) se condensa la cromatina y desaparece la envoltura nuclear; en la anafase (A) se separan las cromátidas hacia los polos; en la telofase (B) se forman de nuevo las envolturas y empieza la citocinesis."},
+{t:"Sobre la meiosis en el ser humano, ¿qué afirmación es correcta?",o:["Da lugar a dos células diploides genéticamente idénticas a la célula madre.","Ocurre en todas las células somáticas para reparar tejidos.","Ocurre en las gónadas y da lugar a cuatro células haploides genéticamente distintas.","Hace que los gametos conserven los 46 cromosomas."],a:2,j:"La meiosis tiene dos divisiones y produce cuatro células haploides (23 cromosomas), distintas entre sí por el sobrecruzamiento y el reparto al azar de cromosomas. A describe la mitosis, que también es la responsable de reparar tejidos (B). Si los gametos tuvieran 46 cromosomas (D), el número se duplicaría en cada fecundación."},
+{t:"¿Cuál de estas características es propia del tejido epitelial?",o:["Está muy vascularizado, con capilares entre sus células.","No tiene vasos sanguíneos y se nutre por difusión desde el tejido conjuntivo subyacente, a través de la membrana basal.","Tiene mucha sustancia intercelular, con células muy separadas.","Su función principal es unir y sostener otros tejidos."],a:1,j:"El epitelio tiene células muy juntas, con poca sustancia intercelular, apoyadas en una membrana basal. Es avascular y se nutre por difusión desde el conjuntivo de debajo. A es la trampa principal. C y D describen el tejido conjuntivo."},
+{t:"El endotelio, que reviste por dentro los vasos sanguíneos y facilita el intercambio de sustancias, es un epitelio de tipo:",o:["Simple plano.","Estratificado plano queratinizado.","De transición.","Pseudoestratificado cilíndrico ciliado."],a:0,j:"El epitelio simple plano tiene una sola capa de células aplanadas, una barrera mínima que facilita la difusión: por eso está en vasos y alvéolos. El estratificado queratinizado (B) forma la epidermis, el de transición (C) la vejiga y el pseudoestratificado ciliado (D) la tráquea y los bronquios."},
+{t:"Sobre el epitelio glandular, ¿qué afirmación es correcta?",o:["Las glándulas sudoríparas son endocrinas porque vierten su secreción al exterior.","La glándula tiroides es exocrina porque libera hormonas.","Las glándulas forman parte del tejido conjuntivo.","Las endocrinas vierten su secreción (hormonas) a la sangre sin conductos; las exocrinas la vierten por conductos a la superficie o a una cavidad."],a:3,j:"El criterio es adónde va la secreción: a la sangre sin conducto (endocrina, como el tiroides) o por un conducto al exterior o a una cavidad (exocrina, como las sudoríparas). A y B invierten la clasificación. C es falsa: el tejido glandular es una variedad de tejido epitelial."},
+{t:"¿Cuál de estos tejidos NO es una variedad de tejido conjuntivo?",o:["Tejido adiposo.","Tejido cartilaginoso.","Epitelio glandular.","Sangre."],a:2,j:"El conjuntivo se caracteriza por una matriz extracelular abundante. Sus variedades son el laxo, el denso, el adiposo, el cartilaginoso, el óseo y la sangre. El epitelio glandular es tejido epitelial. Trampa frecuente: la sangre (D) sí es conjuntivo, un conjuntivo especializado de matriz líquida (el plasma)."},
+{t:"Un paciente ingresa en planta con una hernia de disco lumbar. ¿Qué tipo de tejido forma el disco intervertebral?",o:["Cartílago hialino.","Cartílago elástico.","Tejido óseo esponjoso.","Fibrocartílago."],a:3,j:"El fibrocartílago, rico en fibras de colágeno, resiste la compresión: forma los discos intervertebrales, la sínfisis del pubis y los meniscos. El hialino (A) cubre las superficies articulares y forma los anillos traqueales. El elástico (B) forma el pabellón auricular y la epiglotis. El disco no es hueso (C)."},
+{t:"En la osteoporosis aumenta la pérdida de masa ósea. ¿Qué células del tejido óseo se encargan de reabsorber (destruir) la matriz ósea?",o:["Osteoclastos.","Osteoblastos.","Osteocitos.","Condrocitos."],a:0,j:"Los osteoclastos reabsorben hueso; los osteoblastos (B) forman matriz nueva; los osteocitos (C) son osteoblastos atrapados en la matriz que la mantienen. Regla útil: «clastos» = romper, «blastos» = construir. Los condrocitos (D) son células del cartílago."},
+{t:"¿Qué combinación de características corresponde al músculo cardíaco?",o:["Estriado, voluntario, con fibras multinucleadas de núcleos periféricos.","Estriado, involuntario, con discos intercalares que unen las células.","Liso, involuntario, sin estrías.","Liso y voluntario."],a:1,j:"El cardíaco es estriado como el esquelético, pero involuntario, y sus células se unen por discos intercalares que permiten una contracción coordinada. A describe el esquelético y C el liso. D no existe: el liso siempre es involuntario. La trampa es pensar que estriado equivale a voluntario."},
+{t:"Los movimientos peristálticos del intestino, que hacen avanzar el contenido, se deben a un tejido muscular:",o:["Esquelético, de contracción voluntaria.","Cardíaco, por su contracción rítmica.","Liso, de contracción involuntaria.","Esquelético, de contracción involuntaria."],a:2,j:"El músculo liso forma la pared de las vísceras huecas (tubo digestivo, vejiga, vasos, útero); su contracción es involuntaria y lenta, controlada por el sistema nervioso autónomo. El cardíaco (B) es rítmico pero solo está en el corazón. El esquelético (A y D) mueve el esqueleto y es voluntario."},
+{t:"Sobre el tejido nervioso, señala la afirmación INCORRECTA:",o:["La neurona es su unidad estructural y funcional.","Las dendritas reciben los estímulos y el axón conduce el impulso nervioso.","Las células de la neuroglia sostienen, nutren y protegen a las neuronas.","Las células de la neuroglia generan y transmiten impulsos nerviosos igual que las neuronas."],a:3,j:"Las neuronas generan y transmiten el impulso. La neuroglia sostiene, nutre, aísla y defiende, pero no transmite impulsos como las neuronas. A, B y C son correctas."},
+{t:"¿Cuál es el orden correcto de los niveles de organización de los seres vivos, de menor a mayor complejidad?",o:["Químico (átomos y moléculas) → celular → tisular → órganos → aparatos y sistemas → organismo.","Celular → químico → órganos → tisular → organismo → aparatos.","Tisular → celular → órganos → organismo → aparatos y sistemas.","Químico → tisular → celular → aparatos → órganos → organismo."],a:0,j:"Las moléculas forman células; células del mismo tipo forman tejidos; varios tejidos forman un órgano; varios órganos forman aparatos o sistemas, y el conjunto es el organismo. El error más común es poner el tejido antes que la célula (C y D)."},
+{t:"En la terminología clásica, se llama sistema al conjunto de órganos formados por el mismo tipo de tejido predominante, y aparato al de órganos de tejidos distintos que colaboran en una función. Según este criterio, ¿cuál es un sistema?",o:["El sistema nervioso.","El aparato digestivo.","El aparato respiratorio.","El aparato urinario."],a:0,j:"El sistema nervioso está formado sobre todo por tejido nervioso, igual que el óseo o el muscular por su tejido. Los aparatos digestivo, respiratorio y urinario reúnen órganos de tejidos muy distintos. Atención: esta distinción no es universal y en la terminología internacional se dice «sistema» para todo. En el examen, aplica el criterio de tu libro."},
+{t:"Para describir cualquier localización anatómica se toma como referencia la posición anatómica. ¿Cuál es su descripción correcta?",o:["Tumbado boca arriba, brazos a los lados y palmas hacia el suelo.","De pie, cabeza girada hacia un lado, brazos cruzados sobre el pecho.","De pie, cara y mirada al frente, brazos a lo largo del cuerpo con las palmas hacia delante, pies juntos y paralelos.","De pie, brazos a lo largo del cuerpo con las palmas hacia los muslos."],a:2,j:"Es en bipedestación, mirada horizontal al frente, miembros superiores junto al cuerpo y palmas hacia delante (supinación). La trampa es D: es la postura natural, pero con ella el radio y el cúbito se cruzan y los términos medial y lateral del antebrazo saldrían mal. No es una postura tumbada (A)."},
+{t:"El TCAE detecta una lesión en la piel de la cara anterior del antebrazo, cerca de la muñeca y en el borde del lado del pulgar. ¿Qué descripción es correcta para comunicarla a enfermería?",o:["Distal respecto al codo y en el borde lateral del antebrazo.","Proximal respecto al codo y en el borde medial del antebrazo.","Distal respecto a la muñeca y en el borde medial.","Proximal respecto a la muñeca y en el borde medial."],a:0,j:"En las extremidades, proximal es lo más cercano a la raíz del miembro y distal lo más alejado: cerca de la muñeca es distal respecto al codo. En posición anatómica el pulgar está en el lado lateral. En D, «proximal a la muñeca» es cierto, pero «medial» es falso, y basta un elemento falso para invalidar la opción. B y C fallan en ambos términos."},
+{t:"¿Qué plano anatómico divide el cuerpo en una mitad anterior (ventral) y otra posterior (dorsal)?",o:["Plano sagital medio.","Plano transversal.","Plano frontal (coronal).","Plano parasagital."],a:2,j:"El plano frontal o coronal es vertical, paralelo a la frente, y separa delante de detrás. El sagital (A y D) también es vertical, pero divide en derecha e izquierda: el medio en dos mitades iguales y el parasagital en partes desiguales. El transversal (B) es horizontal y separa arriba de abajo."},
+{t:"Un paciente vuelve de Radiología tras una TC con cortes axiales, que son horizontales. Estos cortes siguen el plano que divide el cuerpo en una parte superior y otra inferior. ¿Cómo se llama?",o:["Sagital.","Frontal.","Parasagital.","Transversal."],a:3,j:"El plano transversal (horizontal o axial) es perpendicular al eje longitudinal del cuerpo y separa una porción superior (craneal) de otra inferior (caudal). Es el plano de los cortes axiales de la TC. Sagital, frontal y parasagital (A, B y C) son verticales."},
+{t:"¿En qué cavidad corporal se aloja la médula espinal?",o:["En la cavidad vertebral (raquídea), que forma parte de la cavidad dorsal.","En la cavidad torácica, que forma parte de la cavidad ventral.","En el mediastino.","En la cavidad pélvica."],a:0,j:"La cavidad dorsal tiene dos partes: la craneal, con el encéfalo, y la vertebral o raquídea, con la médula espinal. La ventral incluye la torácica y la abdominopélvica. El mediastino (C) es la zona central del tórax, con el corazón, la tráquea y el esófago."},
+{t:"Sobre las cavidades de la cavidad ventral, ¿qué afirmación es correcta?",o:["El corazón se aloja en la cavidad abdominal, por debajo del diafragma.","El diafragma separa la cavidad torácica de la abdominal, y la vejiga urinaria se aloja en la cavidad pélvica.","La cavidad craneal forma parte de la cavidad ventral.","Entre la cavidad abdominal y la pélvica hay un músculo que las separa, como el diafragma."],a:1,j:"El diafragma separa tórax y abdomen. En la cavidad pélvica están la vejiga, el recto y los órganos reproductores internos. A es falsa (el corazón está en el mediastino) y C también (la craneal es dorsal). D es la trampa: entre abdomen y pelvis no hay pared muscular. Forman una cavidad continua, la abdominopélvica, cuyo límite es un plano imaginario a la altura del estrecho superior de la pelvis."},
+{t:"Un paciente dice al TCAE que tiene dolor en la parte inferior derecha del abdomen, por debajo de la línea del ombligo y por fuera de la línea media. ¿Cuál es la actuación correcta, con la región bien identificada?",o:["Identificar la zona como hipocondrio derecho y registrarla.","Identificar la zona como fosa ilíaca derecha y comunicarlo a la enfermera responsable, describiendo la localización sin hacer ningún diagnóstico.","Identificar la zona como fosa ilíaca derecha y aplicar calor local por su cuenta para aliviar el dolor.","Identificar la zona como hipogastrio y decirle al paciente que seguramente es apendicitis."],a:1,j:"La región inferior lateral derecha es la fosa ilíaca derecha, donde se proyectan el ciego y el apéndice. El hipocondrio derecho (A) es superior y el hipogastrio (D) es inferior central. El TCAE observa, registra y comunica a enfermería; no diagnostica (D) ni aplica medidas sin indicación (C). Aplicar calor sin valoración ante un dolor abdominal puede enmascarar o empeorar un cuadro."},
+{t:"El TCAE está frente al paciente, que está de pie y de cara a él. El paciente señala una zona del abdomen superior que el TCAE ve a su propia derecha, justo bajo el reborde costal. ¿Qué región es y qué órgano se proyecta típicamente en ella?",o:["Hipocondrio derecho; hígado.","Epigastrio; vesícula biliar.","Hipocondrio izquierdo; bazo.","Fosa ilíaca izquierda; colon sigmoide."],a:2,j:"Trampa de lateralidad: las regiones se nombran según la derecha y la izquierda del paciente, nunca las del observador. Lo que el TCAE ve a su derecha es la izquierda del paciente: el hipocondrio izquierdo, donde se proyecta el bazo. A es la respuesta de quien cae en la trampa. Las nueve regiones son: fila superior, hipocondrio derecho, epigastrio e hipocondrio izquierdo; fila media, flanco derecho, mesogastrio y flanco izquierdo; fila inferior, fosa ilíaca derecha, hipogastrio y fosa ilíaca izquierda."}
+];
+const L=["A","B","C","D"];
+const state={ans:Array(30).fill(null),mode:"exam",pen:true,graded:false};
+const $=s=>document.querySelector(s);
+const quiz=$("#quiz");
+
+function render(){
+  let h="";
+  BLOCKS.forEach(b=>{
+    h+=`<div class="block-h">${b.name}</div>`;
+    for(let i=b.from-1;i<b.to;i++){
+      const q=Q[i];
+      h+=`<article class="q" id="q${i+1}"><div class="q-num">Pregunta ${i+1} de 30</div><p class="q-text">${q.t}</p><div class="opts" role="group" aria-label="Opciones de la pregunta ${i+1}">`;
+      q.o.forEach((o,k)=>{h+=`<button type="button" class="opt" id="q${i+1}o${k}" data-q="${i}" data-k="${k}"><span class="k">${L[k]}</span><span class="tx">${o}</span></button>`});
+      h+=`</div><div class="q-foot"><button type="button" class="linkbtn" data-clear="${i}">Dejar en blanco</button></div><div class="fb" id="fb${i}" hidden></div></article>`;
+    }
+  });
+  quiz.innerHTML=h;
+}
+function revealed(i){return state.graded||(state.mode==="study"&&state.ans[i]!==null)}
+function paint(i){
+  const q=Q[i],a=state.ans[i],show=revealed(i);
+  q.o.forEach((_,k)=>{
+    const b=document.getElementById(`q${i+1}o${k}`);
+    b.className="opt";
+    if(show){
+      if(k===q.a)b.classList.add("right");
+      else if(k===a)b.classList.add("wrong");
+      b.disabled=true;
+    }else{
+      if(k===a)b.classList.add("sel");
+      b.disabled=false;
+    }
+    b.setAttribute("aria-pressed",k===a?"true":"false");
+  });
+  const clr=document.querySelector(`[data-clear="${i}"]`);
+  clr.hidden=show||a===null;
+  const fb=document.getElementById("fb"+i);
+  if(show){
+    let cls,v;
+    if(a===null){cls="blank";v=`En blanco. La respuesta correcta es la ${L[q.a]}.`}
+    else if(a===q.a){cls="ok";v=`Correcta: ${L[q.a]}.`}
+    else{cls="bad";v=`Incorrecta. Marcaste la ${L[a]}; la correcta es la ${L[q.a]}.`}
+    fb.className="fb "+cls;
+    fb.innerHTML=`<span class="v">${v}</span>${q.j}`;
+    fb.hidden=false;
+  }else fb.hidden=true;
+}
+function paintAll(){for(let i=0;i<30;i++)paint(i);progress()}
+function progress(){
+  const n=state.ans.filter(x=>x!==null).length;
+  $("#counter").textContent=`${n}/30 respondidas`;
+  $("#barfill").style.width=(n/30*100)+"%";
+}
+function setPressed(on,off){on.setAttribute("aria-pressed","true");off.setAttribute("aria-pressed","false")}
+
+quiz.addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&!o.disabled){state.ans[+o.dataset.q]=+o.dataset.k;paint(+o.dataset.q);progress();if(state.graded)grade(false);return}
+  const c=e.target.closest("[data-clear]");
+  if(c){state.ans[+c.dataset.clear]=null;paint(+c.dataset.clear);progress()}
+});
+$("#m-exam").onclick=()=>{state.mode="exam";setPressed($("#m-exam"),$("#m-study"));$("#modehint").textContent="Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».";paintAll()};
+$("#m-study").onclick=()=>{state.mode="study";setPressed($("#m-study"),$("#m-exam"));$("#modehint").textContent="Modo estudio: al responder cada pregunta ves enseguida si es correcta y su justificación.";paintAll()};
+$("#p-on").onclick=()=>{state.pen=true;setPressed($("#p-on"),$("#p-off"));if(state.graded)grade(false)};
+$("#p-off").onclick=()=>{state.pen=false;setPressed($("#p-off"),$("#p-on"));if(state.graded)grade(false)};
+$("#grade").onclick=()=>grade(true);
+$("#reset").onclick=()=>{
+  state.ans=Array(30).fill(null);state.graded=false;
+  $("#results").hidden=true;$("#grade").textContent="Corregir examen";
+  paintAll();window.scrollTo({top:0,behavior:"smooth"});
+};
+
+function fmt(x){return x.toFixed(2).replace(".",",")}
+function grade(scroll){
+  state.graded=true;paintAll();
+  let ok=0,bad=0,blank=0;
+  state.ans.forEach((a,i)=>{if(a===null)blank++;else if(a===Q[i].a)ok++;else bad++});
+  const net=state.pen?Math.max(0,ok-bad/3):ok;
+  const nota=net*10/30;
+  const pass=nota>=5;
+  let rows="";
+  BLOCKS.forEach(b=>{
+    let c=0,t=b.to-b.from+1;
+    for(let i=b.from-1;i<b.to;i++)if(state.ans[i]===Q[i].a)c++;
+    rows+=`<tr><td>${b.name}</td><td class="num">${b.from}–${b.to}</td><td class="num">${c}/${t}</td><td><div class="mini"><i style="width:${c/t*100}%"></i></div></td></tr>`;
+  });
+  const fails=[];state.ans.forEach((a,i)=>{if(a!==Q[i].a)fails.push(i+1)});
+  const formula=state.pen
+    ?`[${ok} − (${bad} ÷ 3)] × (10 ÷ 30) = ${fmt(nota)}`
+    :`${ok} × (10 ÷ 30) = ${fmt(nota)}`;
+  $("#results").innerHTML=`
+    <div class="eyebrow">Resultado</div>
+    <h2>Tu nota en el simulacro</h2>
+    <div class="score"><span class="n">${fmt(nota)}</span><span class="of">sobre 10</span><span class="pill ${pass?"pass":"fail"}">${pass?"Aprobado":"Suspenso"}</span></div>
+    <div class="tally"><div><span>Aciertos</span><b>${ok}</b></div><div><span>Errores</span><b>${bad}</b></div><div><span>En blanco</span><b>${blank}</b></div></div>
+    <div class="formula">${formula}</div>
+    ${fails.length?`<p class="note">Repasa las preguntas: ${fails.map(n=>`<a href="#q${n}">${n}</a>`).join(", ")}.</p>`:`<p class="note">Sin fallos ni preguntas en blanco.</p>`}
+    <h3>Aciertos por bloque</h3>
+    <div class="tbl-wrap"><table><thead><tr><th>Bloque</th><th>Preguntas</th><th>Aciertos</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3>Cómo se calcula la nota</h3>
+    <p>Con penalización, cada error resta un tercio de acierto y las preguntas en blanco no cuentan. Para un 5 necesitas 15 puntos netos. No existe una fórmula única para todas las pruebas libres: consulta los criterios de calificación que publica el centro donde te examines.</p>
+    <p>Estrategia: si se penalizan los errores, responde solo cuando puedas descartar al menos dos opciones con seguridad. Si no se penalizan, contesta todas.</p>
+    <h3>Lo que más se pregunta</h3>
+    <ul class="tips">
+      <li>Diferencias entre RER y REL y función de cada orgánulo. Los ribosomas están en todas las células.</li>
+      <li>Los tres tipos de cartílago y dónde se encuentra cada uno.</li>
+      <li>El músculo cardíaco es estriado pero involuntario.</li>
+      <li>La sangre es tejido conjuntivo.</li>
+      <li>Mitosis frente a meiosis: número de células, diploide o haploide, y para qué sirve cada una.</li>
+      <li>Derecha e izquierda se refieren siempre al paciente. En posición anatómica el pulgar es lateral.</li>
+      <li>Las nueve regiones abdominales y los órganos que se proyectan en cada una.</li>
+      <li>Entre las cavidades abdominal y pélvica no hay ninguna pared muscular.</li>
+    </ul>`;
+  $("#results").hidden=false;
+  $("#grade").textContent="Recalcular nota";
+  if(scroll)$("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+render();paintAll();
+</script>
+
+</html>

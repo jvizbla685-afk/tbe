@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulacro TCAE · Piel e higiene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: hoja de examen en una columna; cabecera fija con progreso; resultados al final */
+:root{
+  --bg:#f3f6f7; --paper:#ffffff; --ink:#15262e; --muted:#5a6d75; --line:#d5dfe2;
+  --accent:#0d6e66; --accent-soft:#dcefec;
+  --ok:#1d7a3a; --ok-soft:#e3f3e7; --bad:#b4332d; --bad-soft:#fbe6e4; --blank:#8a6a12; --blank-soft:#fbf2d9;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --paper:#172225; --ink:#e3ecee; --muted:#93a6ac; --line:#2b3a3e;
+  --accent:#4fc2b6; --accent-soft:#163633;
+  --ok:#5fcf80; --ok-soft:#173222; --bad:#f08178; --bad-soft:#3a1d1b; --blank:#e3c165; --blank-soft:#342c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top-in .t{font:700 15px/1.2 var(--display);flex:1 1 200px;min-width:0}
+.counter{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex:1 1 100%}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.intro{padding-block:36px 8px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(30px,6vw,44px)/1.08 var(--display);margin:.25em 0 .35em;text-wrap:balance}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;padding:0;list-style:none;font-size:15px}
+.meta b{font-family:var(--mono);font-weight:500}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0 8px;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.controls .lbl{font-weight:700;font-size:15px;margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--paper)}
+.controls .hint{flex:1 1 100%;font-size:14px;color:var(--muted);margin:0}
+.block-h{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+.block-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;margin-bottom:16px;scroll-margin-top:90px}
+.q-num{font:500 13px var(--mono);color:var(--accent)}
+.q-text{font-weight:600;margin:6px 0 14px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:500 13px var(--mono)}
+.opt .tx{min-width:0}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .k{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:var(--paper);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.q-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.linkbtn{background:none;border:0;color:var(--muted);font:600 14px var(--body);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15.5px}
+.fb.ok{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)} .fb.blank{background:var(--blank-soft)}
+.fb .v{font-weight:700;display:block;margin-bottom:4px}
+.fb.ok .v{color:var(--ok)} .fb.bad .v{color:var(--bad)} .fb.blank .v{color:var(--blank)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
+.btn{font:700 16px var(--body);border-radius:8px;padding:12px 20px;cursor:pointer;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#results{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px 20px;margin-top:8px;scroll-margin-top:80px}
+#results h2{font:700 26px/1.15 var(--display);margin:0 0 4px}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin:12px 0 18px}
+.score .n{font:700 64px/1 var(--display);font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted);font-family:var(--mono);font-size:15px}
+.pill{display:inline-block;font:700 13px var(--body);padding:4px 10px;border-radius:999px}
+.pill.pass{background:var(--ok-soft);color:var(--ok)} .pill.fail{background:var(--bad-soft);color:var(--bad)}
+.tally{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.tally div{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tally span{display:block;font-size:13px;color:var(--muted)}
+.tally b{font:500 22px var(--mono);font-variant-numeric:tabular-nums}
+.formula{font-family:var(--mono);font-size:14px;background:var(--bg);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini{height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:70px}
+.mini i{display:block;height:100%;background:var(--accent)}
+.tips{margin:20px 0 0;padding-left:20px}
+.tips li{margin-bottom:6px}
+h3{font:700 18px var(--display);margin:24px 0 8px}
+.note{font-size:14px;color:var(--muted);margin-top:16px}
+footer{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
+@media (max-width:480px){.q{padding:16px 14px}.tally{grid-template-columns:1fr 1fr 1fr}.score .n{font-size:52px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <span class="t">Simulacro TCAE · 30 preguntas</span>
+  <span class="counter" id="counter">0/30 respondidas</span>
+  <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">Pruebas libres · Técnico en Cuidados Auxiliares de Enfermería</div>
+    <h1>La piel y la higiene del paciente</h1>
+    <p class="lead">Simulacro tipo test con casos prácticos y preguntas trampa. Elige una respuesta en cada pregunta. Puedes dejar preguntas en blanco: no suman ni restan.</p>
+    <ul class="meta">
+      <li><b>30</b> preguntas</li>
+      <li><b>4</b> opciones, una correcta</li>
+      <li>Tiempo orientativo: <b>45 min</b></li>
+    </ul>
+  </section>
+
+  <div class="controls" role="group" aria-label="Opciones del simulacro">
+    <span class="lbl">Modo</span>
+    <div class="seg">
+      <button type="button" id="m-exam" aria-pressed="true">Examen</button>
+      <button type="button" id="m-study" aria-pressed="false">Estudio</button>
+    </div>
+    <span class="lbl" style="margin-left:8px">Penalización</span>
+    <div class="seg">
+      <button type="button" id="p-on" aria-pressed="true">−1/3 por error</button>
+      <button type="button" id="p-off" aria-pressed="false">Sin penalizar</button>
+    </div>
+    <p class="hint" id="modehint">Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».</p>
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="actions">
+    <button type="button" class="btn primary" id="grade">Corregir examen</button>
+    <button type="button" class="btn ghost" id="reset">Empezar de nuevo</button>
+  </div>
+
+  <section id="results" hidden></section>
+
+</main>
+
+<script>
+const BLOCKS=[
+  {name:"Estructura y capas de la piel",from:1,to:4},
+  {name:"Receptores, anejos y glándulas",from:5,to:8},
+  {name:"Funciones de la piel",from:9,to:9},
+  {name:"Lesiones elementales",from:10,to:13},
+  {name:"Objetivos, normas, intimidad y autonomía",from:14,to:18},
+  {name:"Aseo del paciente encamado",from:19,to:21},
+  {name:"Ojos, boca, cabello y genitales",from:22,to:27},
+  {name:"Uñas, pies y observación de la piel",from:28,to:30}
+];
+const Q=[
+{t:"Al estudiar una biopsia de piel de la planta del pie se observa una capa traslúcida entre el estrato granuloso y el córneo. Esa capa no aparece en la piel del abdomen. ¿De qué estrato se trata?",o:["Estrato basal.","Estrato lúcido.","Estrato espinoso.","Dermis papilar."],a:1,j:"Los estratos de la epidermis, de profundo a superficial, son: basal (germinativo), espinoso, granuloso, lúcido y córneo. El lúcido solo existe en la piel gruesa: palmas de las manos y plantas de los pies. El basal (A) es el más profundo y en él se dividen las células. El espinoso (C) está en toda la piel. La dermis papilar (D) no forma parte de la epidermis."},
+{t:"¿Qué afirmación sobre las células de la epidermis es correcta?",o:["Los melanocitos se encuentran en el estrato córneo.","Los queratinocitos son las células que producen la melanina.","Las células de Langerhans son los receptores del frío.","Los melanocitos están en el estrato basal y producen melanina; las células de Langerhans participan en la defensa inmunitaria."],a:3,j:"Los melanocitos están en el estrato basal y fabrican melanina, que protege de la radiación ultravioleta; después la transfieren a los queratinocitos. Las células de Langerhans captan antígenos y forman parte de la defensa inmunitaria. El estrato córneo (A) está formado por células muertas. Los queratinocitos (B) producen queratina. Los receptores del frío (C) están en la dermis."},
+{t:"Un paciente se hace un roce muy superficial que solo afecta a la epidermis. La herida no sangra. ¿Por qué?",o:["Porque la epidermis no tiene vasos sanguíneos; los vasos están en la dermis.","Porque la epidermis solo contiene células muertas.","Porque la sangre coagula de forma inmediata en la piel.","Porque la epidermis es un tejido conjuntivo sin vasos."],a:0,j:"La epidermis es un epitelio estratificado plano queratinizado y, como todo epitelio, es avascular: se nutre por difusión desde los vasos de la dermis. Solo sangran las lesiones que llegan a la dermis. B es falsa porque en los estratos profundos hay células vivas. C no explica nada. D se equivoca de tejido: la epidermis es epitelial."},
+{t:"Una paciente anciana, muy delgada, ha perdido casi todo el tejido subcutáneo. ¿Qué funciones se ven más afectadas?",o:["La síntesis de melanina y la protección frente a la radiación ultravioleta.","La producción de sebo.","El aislamiento térmico, la reserva de energía y la amortiguación de presiones, con más riesgo de lesiones sobre las prominencias óseas.","La producción de queratina."],a:2,j:"La hipodermis está formada sobre todo por tejido adiposo: aísla del frío, almacena energía y amortigua presiones. Si falta, las prominencias óseas quedan poco protegidas y aumenta el riesgo de lesiones por presión. La melanina (A) y la queratina (D) se producen en la epidermis. El sebo (B) lo fabrican las glándulas sebáceas de la dermis."},
+{t:"Durante el aseo, un paciente dice que no nota el agua fría en los pies. Según la clasificación clásica de los receptores cutáneos, ¿qué receptores captan el frío?",o:["Corpúsculos de Krause.","Corpúsculos de Pacini.","Corpúsculos de Meissner.","Corpúsculos de Ruffini."],a:0,j:"En los manuales de TCAE: Krause, frío; Ruffini, calor; Meissner, tacto fino; Pacini, presión profunda y vibración; terminaciones nerviosas libres, dolor. La trampa habitual es cambiar Krause por Ruffini. La fisiología actual atribuye la sensación térmica sobre todo a terminaciones libres, pero en el examen se pregunta la clasificación clásica. Un paciente que no nota la temperatura tiene más riesgo de quemarse: comprueba siempre el agua."},
+{t:"¿Qué glándulas empiezan a funcionar en la pubertad, se localizan en axilas, ingles y región anogenital y vierten su secreción al folículo piloso, que produce olor cuando la descomponen las bacterias?",o:["Glándulas sudoríparas ecrinas.","Glándulas sebáceas.","Glándulas sudoríparas apocrinas.","Glándulas endocrinas de la piel."],a:2,j:"Las apocrinas se activan en la pubertad, están en zonas concretas (axilas, ingles, areolas, región anogenital) y desembocan en el folículo piloso. Su secreción huele cuando la descomponen las bacterias. Las ecrinas (A) están por todo el cuerpo, abundan en palmas, plantas y frente, desembocan directamente en la superficie y sirven sobre todo para la termorregulación. Las sebáceas (B) producen sebo. Las glándulas de la piel son exocrinas (D)."},
+{t:"Sobre las glándulas sebáceas, ¿qué afirmación es correcta?",o:["Son muy abundantes en las palmas de las manos y las plantas de los pies.","Vierten el sebo al folículo piloso, lubrican e impermeabilizan la piel y el pelo, y no existen en palmas ni plantas.","Su función principal es la termorregulación.","Producen un sudor rico en agua y sales."],a:1,j:"Las glándulas sebáceas suelen estar asociadas al pelo y vierten el sebo al folículo; el sebo lubrica, impermeabiliza y protege. No hay glándulas sebáceas en palmas ni plantas, que tampoco tienen pelo: esa es la trampa de A. La termorregulación (C) y el sudor (D) corresponden a las sudoríparas ecrinas."},
+{t:"Un paciente pierde una uña por un traumatismo. ¿De qué estructura depende que vuelva a crecer?",o:["Del borde libre.","De la cutícula.","Del músculo erector del pelo.","De la matriz ungueal."],a:3,j:"La matriz ungueal, bajo el pliegue proximal, es donde se forman las nuevas células queratinizadas. Si la matriz está sana, la uña vuelve a crecer. El borde libre (A) es la parte que sobresale del dedo. La cutícula (B) protege la base de la uña. El músculo erector (C) pertenece al pelo."},
+{t:"Después del aseo, en una habitación fría, un paciente tiene la piel de gallina y tiembla. ¿Qué respuesta de la piel ante el frío se está produciendo?",o:["Vasoconstricción de la piel y contracción de los músculos erectores del pelo.","Vasodilatación de la piel y sudoración.","Aumento de la secreción de sebo.","Vasodilatación y piloerección."],a:0,j:"Ante el frío, los vasos de la piel se contraen (vasoconstricción) para perder menos calor, y los músculos erectores del pelo producen la piel de gallina; los temblores generan calor. Ante el calor ocurre lo contrario: vasodilatación y sudoración (B). D mezcla una respuesta al calor con una al frío. Por eso la habitación debe estar templada y sin corrientes."},
+{t:"Durante el aseo, el TCAE ve en el talón de un paciente una lesión elevada y bien delimitada, de unos 2 cm, llena de líquido transparente. ¿Cómo se llama esta lesión?",o:["Vesícula.","Pústula.","Ampolla (flictena).","Pápula."],a:2,j:"La vesícula y la ampolla contienen líquido seroso y se diferencian por el tamaño: la ampolla es mayor de 0,5 cm según unos manuales y de 1 cm según otros. Con 2 cm es una ampolla con cualquier criterio. La pústula (B) contiene pus. La pápula (D) es sólida. El TCAE no debe pinchar la ampolla: la protege y lo comunica a enfermería."},
+{t:"Tras tomar un fármaco, un paciente presenta una lesión elevada, rosada, con edema y picor, que desaparece en pocas horas sin dejar rastro. ¿Qué lesión elemental es?",o:["Pápula.","Habón (roncha).","Nódulo.","Placa."],a:1,j:"El habón se debe a un edema de la dermis, es pasajero (menos de 24 horas) y es típico de la urticaria y de las reacciones alérgicas. La pápula (A) y el nódulo (C) son lesiones sólidas que persisten. La placa (D) es una elevación sólida, extensa y aplanada. Una reacción así tras un fármaco debe comunicarse enseguida a enfermería."},
+{t:"¿Cuál de estas lesiones es una lesión secundaria?",o:["Mácula.","Vesícula.","Pústula.","Costra."],a:3,j:"Las lesiones primarias aparecen sobre piel sana: mácula, pápula, nódulo, habón, vesícula, ampolla, pústula. Las secundarias surgen de la evolución de una primaria, del rascado o de un traumatismo: costra, escama, erosión, excoriación, úlcera, fisura, cicatriz. La costra se forma cuando se seca el suero, la sangre o el pus de una lesión anterior."},
+{t:"¿Cómo se llama una lesión con pérdida de epidermis y dermis que, al curar, deja cicatriz?",o:["Úlcera.","Erosión.","Excoriación.","Fisura."],a:0,j:"La úlcera afecta a la epidermis y a la dermis, y a veces a capas más profundas; por eso cura dejando cicatriz. La erosión (B) solo afecta a la epidermis y cura sin cicatriz: es la diferencia que más se pregunta. La excoriación (C) es una pérdida lineal causada por el rascado. La fisura (D) es una grieta lineal, típica en talones y comisuras."},
+{t:"¿Cuál de estas finalidades NO es un objetivo de la higiene del paciente?",o:["Eliminar la suciedad y las secreciones, y prevenir infecciones.","Estimular la circulación y favorecer el bienestar y la autoestima.","Diagnosticar las lesiones de la piel que se encuentren durante el aseo.","Aprovechar el aseo para observar el estado de la piel."],a:2,j:"La higiene sirve para limpiar, prevenir infecciones y lesiones, estimular la circulación y dar comodidad y autoestima. El aseo también es un buen momento para observar la piel (D). Pero el TCAE observa, registra y comunica lo que encuentra; no diagnostica."},
+{t:"¿Qué condiciones ambientales son correctas para el aseo de un paciente?",o:["Agua a 45-50 °C para eliminar mejor la suciedad.","Agua a unos 37-40 °C, comprobada antes de usarla, y habitación a unos 22-24 °C, sin corrientes de aire.","Agua fría para estimular la circulación.","Agua a 30 °C y habitación a 18 °C con la ventana abierta para ventilar."],a:1,j:"El agua debe estar templada, alrededor de 37-40 °C (algunos manuales dicen 38-40 °C), y hay que comprobarla siempre con un termómetro de baño o con la cara interna del antebrazo o el codo, más sensibles que la mano. La habitación, a unos 22-24 °C y sin corrientes. El agua de A puede quemar, sobre todo a ancianos y a pacientes con poca sensibilidad. C y D provocan frío y malestar."},
+{t:"Una paciente está encamada en una habitación doble. ¿Qué actuación protege mejor su intimidad durante el aseo?",o:["Destaparla del todo para terminar antes.","Dejar la puerta abierta por si hace falta pedir ayuda.","Hacer el aseo en horario de visitas para que ayude la familia.","Correr la cortina o poner un biombo, cerrar la puerta y cubrirla con una sábana o toalla, dejando al descubierto solo la zona que se lava."],a:3,j:"Proteger la intimidad es una obligación ética y un derecho del paciente: se aísla visualmente (puerta, cortina o biombo) y se descubre solo la zona que se está lavando, lo que además evita que se enfríe. Si se necesita ayuda, se usa el timbre o se avisa a un compañero antes de empezar (B). Las visitas deben salir, salvo que el paciente quiera otra cosa (C)."},
+{t:"Un paciente autónomo puede ducharse solo. ¿Cuál es la actuación del TCAE?",o:["Preparar el material, comprobar que el baño es seguro y supervisar, fomentando su autocuidado y ayudando solo en lo que no pueda hacer.","Hacerle el aseo completo para ahorrar tiempo.","Dejarlo solo sin comprobar nada, para respetar su autonomía.","Hacerle el aseo en la cama."],a:0,j:"Con el paciente autónomo, el TCAE facilita y supervisa. Fomentar el autocuidado mantiene la independencia y la autoestima. Hacerlo todo por él (B, D) crea una dependencia innecesaria. Respetar su autonomía no significa desentenderse de su seguridad (C): hay que comprobar la temperatura del agua, el suelo y el timbre."},
+{t:"Un paciente con riesgo de caídas se va a duchar. ¿Cuál es la actuación correcta?",o:["Dejarlo solo con el pestillo echado para respetar su intimidad.","Abrir primero el grifo del agua caliente para que se caliente antes.","Usar una silla de ducha y una alfombrilla antideslizante, comprobar la temperatura del agua, dejar el timbre a su alcance, no dejarlo solo y no echar el pestillo.","Ducharlo con agua fría para que la ducha dure menos."],a:2,j:"La prioridad es evitar caídas y quemaduras: apoyos, suelo antideslizante, timbre accesible y puerta sin pestillo para poder entrar si hay un problema (A). Si se regula la temperatura en un grifo de dos llaves, se abre primero el agua fría y luego la caliente, para evitar las quemaduras de B. El agua fría (D) causa malestar."},
+{t:"En el aseo completo del paciente encamado, ¿qué principio sobre el orden es correcto?",o:["Empezar por los genitales, porque es la zona más contaminada.","Ir de las zonas más limpias a las más sucias: la cara al principio y la región genital y anal al final, cambiando el agua cuantas veces haga falta.","Empezar por los pies y terminar por la cara.","Usar la misma agua y la misma esponja para todo el cuerpo."],a:1,j:"El principio es de limpio a sucio, para no llevar microorganismos de las zonas contaminadas a las limpias. Un orden habitual: ojos, cara, orejas y cuello; brazos, manos y axilas; tórax y abdomen; piernas y pies; espalda y nalgas; y por último genitales y zona anal. El agua se cambia cuando está sucia o fría y siempre antes de los genitales. A y C invierten el principio. D facilita la contaminación cruzada."},
+{t:"¿En qué sentido se lavan las extremidades del paciente encamado?",o:["De proximal a distal, para arrastrar la suciedad hacia las manos y los pies.","Es indiferente.","Con movimientos circulares enérgicos sobre las prominencias óseas enrojecidas.","De distal a proximal (de la mano hacia la axila y del pie hacia la ingle), para favorecer el retorno venoso."],a:3,j:"Las extremidades se lavan de distal a proximal, siguiendo el sentido de la circulación venosa hacia el corazón. Las manos y los pies se pueden meter en la palangana y después se secan bien entre los dedos. C es peligrosa: frotar zonas enrojecidas sobre prominencias óseas daña los tejidos."},
+{t:"Después de lavar a una paciente con obesidad, ¿qué es lo correcto?",o:["Secar a fondo, sin frotar, sobre todo los pliegues submamarios, inguinales, abdominales e interdigitales, para evitar la maceración y las infecciones.","Dejar los pliegues húmedos para que la piel se hidrate.","Echar abundante talco en los pliegues todavía húmedos.","Frotar con energía con la toalla para activar la circulación."],a:0,j:"La humedad en los pliegues macera la piel y favorece las infecciones, sobre todo por hongos. El secado se hace con pequeños toques, sin frotar. El talco sobre piel húmeda (C) forma grumos que irritan. Frotar con energía (D) daña la piel frágil. La hidratación se consigue con crema sobre piel seca (B)."},
+{t:"Un paciente inconsciente tiene legañas. ¿Cómo se hace correctamente la higiene de los ojos?",o:["Con una esponja y agua jabonosa, desde el ángulo externo hacia el interno.","Con la misma gasa para los dos ojos, para gastar menos material.","Con una gasa humedecida en suero fisiológico, desde el ángulo interno hacia el externo, usando una gasa distinta para cada ojo.","Con una gasa seca, desde el ángulo externo hacia el interno."],a:2,j:"Se limpia del ángulo interno (lagrimal) hacia el externo, para no arrastrar suciedad al conducto lagrimal, con una gasa por ojo y por pasada para no contaminar un ojo con el otro (B). Se usa suero fisiológico: el jabón irrita la córnea (A) y la gasa seca puede dañarla (D). Las lágrimas artificiales o las gasas húmedas sobre los párpados se aplican según la pauta de enfermería."},
+{t:"Hay que hacer la higiene de la boca a un paciente inconsciente. ¿Qué es lo prioritario para su seguridad?",o:["Colocarlo boca arriba, con la cabeza hiperextendida, y usar abundante agua.","Colocarlo de lado (o con la cabeza girada) y usar una torunda o gasa húmeda, con muy poco líquido, para evitar que aspire el líquido a los pulmones.","Cepillarle con pasta de dientes y enjuagar con abundante agua.","Darle agua para que se enjuague."],a:1,j:"El paciente inconsciente no traga de forma eficaz y puede broncoaspirar. Por eso se le coloca de lado o con la cabeza girada y se usa una torunda o un depresor con gasa ligeramente humedecidos, a veces con el antiséptico que indique el protocolo. Después se hidratan los labios. A, C y D introducen demasiado líquido o exigen una colaboración imposible."},
+{t:"¿Cómo se limpia correctamente una prótesis dental?",o:["Con agua muy caliente, para desinfectarla.","Se guarda en seco, envuelta en papel.","Se deja puesta toda la noche como norma.","Se cepilla con agua fría o templada, sobre un recipiente con agua o una toalla, y se guarda en un recipiente identificado con agua o con la solución indicada."],a:3,j:"Trampa de temperatura: el agua caliente (A) puede deformar la resina de la prótesis. Se limpia sobre una toalla o un recipiente con agua para que no se rompa si se cae, y se guarda en un recipiente identificado con el nombre del paciente, en líquido, porque si se seca (B) se puede deformar. Lo habitual es retirarla por la noche para que descanse la mucosa (C)."},
+{t:"¿En cuál de estos casos NO se debe lavar el cabello en la cama sin consultar antes a enfermería?",o:["Paciente con lesión cervical o traumatismo craneal reciente.","Paciente con el pelo largo.","Paciente encamado por una fractura de tobillo.","Paciente que lo pide expresamente."],a:0,j:"Lavar el cabello en la cama obliga a mover el cuello y apoyar la cabeza en el borde o en un lavacabezas. Está contraindicado sin indicación si hay lesión cervical, traumatismo craneal, cirugía reciente de cabeza o cuello o inestabilidad del paciente. En los demás casos se hace con el procedimiento habitual: proteger oídos con algodón y ojos con una toalla, agua templada y secado inmediato."},
+{t:"¿Cómo se hace la higiene de los genitales de una paciente?",o:["Desde el ano hacia el pubis.","Pasando varias veces la misma zona de la gasa.","Separando los labios y limpiando desde el pubis hacia el ano, con una pasada por cada gasa o zona de la esponja.","Lavando el interior de la vagina con agua como rutina."],a:2,j:"En la mujer se limpia de delante hacia atrás (del pubis al ano), para no llevar bacterias de la zona anal a la uretra y la vagina y reducir el riesgo de infección urinaria. Por eso A y B son incorrectas. Los lavados vaginales (D) no forman parte del aseo; solo se hacen por prescripción."},
+{t:"Durante el aseo de un paciente varón, el TCAE retira el prepucio para limpiar el glande. ¿Qué debe hacer después?",o:["Dejar el prepucio retirado para que la zona se seque.","Volver a colocar el prepucio en su posición, para evitar una parafimosis.","Aplicar talco en el glande.","Nada, porque el prepucio no se debe retirar nunca."],a:1,j:"Si el prepucio se queda retirado puede comprimir el glande y producir una parafimosis: edema, dolor y riesgo de isquemia, una urgencia. Después de limpiar y secar, siempre se vuelve a colocar. D es falsa: retirarlo es necesario para limpiar bien el glande. El talco (C) no está indicado."},
+{t:"Un paciente diabético tiene las uñas de los pies largas. ¿Cuál es la actuación correcta del TCAE?",o:["Meter los pies 30 minutos en agua caliente y cortar las uñas con tijera.","Cortar las uñas en curva y redondear las esquinas.","Aplicar un producto para quitar callos.","No cortarle las uñas y comunicarlo a enfermería para que lo haga el podólogo o el profesional que marque el protocolo. Mientras, lavar los pies con agua templada comprobada, secar bien entre los dedos y observar si hay lesiones."],a:3,j:"El diabético suele tener menos sensibilidad (neuropatía) y peor circulación: una pequeña herida puede acabar en una úlcera grave. Por eso, en general, el TCAE no le corta las uñas; lo hace el profesional que establezca el protocolo del centro. El agua caliente y el remojo prolongado (A) pueden quemar y macerar la piel. Los callicidas (C) pueden causar úlceras."},
+{t:"En un paciente sin diabetes ni problemas de circulación, ¿cómo se cortan las uñas de los pies?",o:["En línea recta, sin recortar las esquinas, para evitar que se encarnen. Las uñas de las manos se cortan redondeadas.","En curva, igual que las de las manos.","Muy cortas, recortando bien las esquinas.","Arrancando los padrastros para que no se enganchen."],a:0,j:"Las uñas de los pies se cortan rectas. Si se cortan en curva o se recortan las esquinas (B, C), el borde crece hacia dentro de la piel y se produce una uña encarnada (onicocriptosis). Las de las manos sí se cortan redondeadas. Arrancar padrastros (D) abre heridas; se cortan con cuidado. Antes de cortar, conviene ablandar las uñas con un remojo breve."},
+{t:"Durante el aseo, el TCAE ve en el sacro una zona enrojecida que no se vuelve blanca al presionarla con el dedo. ¿Qué debe hacer?",o:["Masajearla con energía para reactivar la circulación.","Poner un apósito y tratar la lesión él mismo.","No masajearla, mantener la piel limpia y seca, aliviar la presión con los cambios de postura del plan de cuidados, y comunicarlo y registrarlo para que lo valore enfermería.","Aplicar alcohol para endurecer la piel."],a:2,j:"Un enrojecimiento que no blanquea al presionarlo es el primer signo de una lesión por presión (categoría I). No se debe masajear (A), porque daña aún más los tejidos. El alcohol (D) reseca la piel. El TCAE alivia la presión, cuida la piel y comunica y registra; la valoración y el tratamiento corresponden a enfermería (B)."}
+];
+const L=["A","B","C","D"];
+const state={ans:Array(30).fill(null),mode:"exam",pen:true,graded:false};
+const $=s=>document.querySelector(s);
+const quiz=$("#quiz");
+
+function render(){
+  let h="";
+  BLOCKS.forEach(b=>{
+    h+=`<div class="block-h">${b.name}</div>`;
+    for(let i=b.from-1;i<b.to;i++){
+      const q=Q[i];
+      h+=`<article class="q" id="q${i+1}"><div class="q-num">Pregunta ${i+1} de 30</div><p class="q-text">${q.t}</p><div class="opts" role="group" aria-label="Opciones de la pregunta ${i+1}">`;
+      q.o.forEach((o,k)=>{h+=`<button type="button" class="opt" id="q${i+1}o${k}" data-q="${i}" data-k="${k}"><span class="k">${L[k]}</span><span class="tx">${o}</span></button>`});
+      h+=`</div><div class="q-foot"><button type="button" class="linkbtn" data-clear="${i}">Dejar en blanco</button></div><div class="fb" id="fb${i}" hidden></div></article>`;
+    }
+  });
+  quiz.innerHTML=h;
+}
+function revealed(i){return state.graded||(state.mode==="study"&&state.ans[i]!==null)}
+function paint(i){
+  const q=Q[i],a=state.ans[i],show=revealed(i);
+  q.o.forEach((_,k)=>{
+    const b=document.getElementById(`q${i+1}o${k}`);
+    b.className="opt";
+    if(show){
+      if(k===q.a)b.classList.add("right");
+      else if(k===a)b.classList.add("wrong");
+      b.disabled=true;
+    }else{
+      if(k===a)b.classList.add("sel");
+      b.disabled=false;
+    }
+    b.setAttribute("aria-pressed",k===a?"true":"false");
+  });
+  const clr=document.querySelector(`[data-clear="${i}"]`);
+  clr.hidden=show||a===null;
+  const fb=document.getElementById("fb"+i);
+  if(show){
+    let cls,v;
+    if(a===null){cls="blank";v=`En blanco. La respuesta correcta es la ${L[q.a]}.`}
+    else if(a===q.a){cls="ok";v=`Correcta: ${L[q.a]}.`}
+    else{cls="bad";v=`Incorrecta. Marcaste la ${L[a]}; la correcta es la ${L[q.a]}.`}
+    fb.className="fb "+cls;
+    fb.innerHTML=`<span class="v">${v}</span>${q.j}`;
+    fb.hidden=false;
+  }else fb.hidden=true;
+}
+function paintAll(){for(let i=0;i<30;i++)paint(i);progress()}
+function progress(){
+  const n=state.ans.filter(x=>x!==null).length;
+  $("#counter").textContent=`${n}/30 respondidas`;
+  $("#barfill").style.width=(n/30*100)+"%";
+}
+function setPressed(on,off){on.setAttribute("aria-pressed","true");off.setAttribute("aria-pressed","false")}
+
+quiz.addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&!o.disabled){state.ans[+o.dataset.q]=+o.dataset.k;paint(+o.dataset.q);progress();if(state.graded)grade(false);return}
+  const c=e.target.closest("[data-clear]");
+  if(c){state.ans[+c.dataset.clear]=null;paint(+c.dataset.clear);progress()}
+});
+$("#m-exam").onclick=()=>{state.mode="exam";setPressed($("#m-exam"),$("#m-study"));$("#modehint").textContent="Modo examen: la corrección y las justificaciones aparecen al pulsar «Corregir examen».";paintAll()};
+$("#m-study").onclick=()=>{state.mode="study";setPressed($("#m-study"),$("#m-exam"));$("#modehint").textContent="Modo estudio: al responder cada pregunta ves enseguida si es correcta y su justificación.";paintAll()};
+$("#p-on").onclick=()=>{state.pen=true;setPressed($("#p-on"),$("#p-off"));if(state.graded)grade(false)};
+$("#p-off").onclick=()=>{state.pen=false;setPressed($("#p-off"),$("#p-on"));if(state.graded)grade(false)};
+$("#grade").onclick=()=>grade(true);
+$("#reset").onclick=()=>{
+  state.ans=Array(30).fill(null);state.graded=false;
+  $("#results").hidden=true;$("#grade").textContent="Corregir examen";
+  paintAll();window.scrollTo({top:0,behavior:"smooth"});
+};
+
+function fmt(x){return x.toFixed(2).replace(".",",")}
+function grade(scroll){
+  state.graded=true;paintAll();
+  let ok=0,bad=0,blank=0;
+  state.ans.forEach((a,i)=>{if(a===null)blank++;else if(a===Q[i].a)ok++;else bad++});
+  const net=state.pen?Math.max(0,ok-bad/3):ok;
+  const nota=net*10/30;
+  const pass=nota>=5;
+  let rows="";
+  BLOCKS.forEach(b=>{
+    let c=0,t=b.to-b.from+1;
+    for(let i=b.from-1;i<b.to;i++)if(state.ans[i]===Q[i].a)c++;
+    rows+=`<tr><td>${b.name}</td><td class="num">${b.from}–${b.to}</td><td class="num">${c}/${t}</td><td><div class="mini"><i style="width:${c/t*100}%"></i></div></td></tr>`;
+  });
+  const fails=[];state.ans.forEach((a,i)=>{if(a!==Q[i].a)fails.push(i+1)});
+  const formula=state.pen
+    ?`[${ok} − (${bad} ÷ 3)] × (10 ÷ 30) = ${fmt(nota)}`
+    :`${ok} × (10 ÷ 30) = ${fmt(nota)}`;
+  $("#results").innerHTML=`
+    <div class="eyebrow">Resultado</div>
+    <h2>Tu nota en el simulacro</h2>
+    <div class="score"><span class="n">${fmt(nota)}</span><span class="of">sobre 10</span><span class="pill ${pass?"pass":"fail"}">${pass?"Aprobado":"Suspenso"}</span></div>
+    <div class="tally"><div><span>Aciertos</span><b>${ok}</b></div><div><span>Errores</span><b>${bad}</b></div><div><span>En blanco</span><b>${blank}</b></div></div>
+    <div class="formula">${formula}</div>
+    ${fails.length?`<p class="note">Repasa las preguntas: ${fails.map(n=>`<a href="#q${n}">${n}</a>`).join(", ")}.</p>`:`<p class="note">Sin fallos ni preguntas en blanco.</p>`}
+    <h3>Aciertos por bloque</h3>
+    <div class="tbl-wrap"><table><thead><tr><th>Bloque</th><th>Preguntas</th><th>Aciertos</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3>Cómo se calcula la nota</h3>
+    <p>Con penalización, cada error resta un tercio de acierto y las preguntas en blanco no cuentan. Para un 5 necesitas 15 puntos netos. No existe una fórmula única para todas las pruebas libres: consulta los criterios de calificación que publica el centro donde te examines.</p>
+    <p>Estrategia: si se penalizan los errores, responde solo cuando puedas descartar al menos dos opciones con seguridad. Si no se penalizan, contesta todas.</p>
+    <h3>Lo que más se pregunta</h3>
+    <ul class="tips">
+      <li>Estratos de la epidermis en orden. El estrato lúcido solo está en palmas y plantas.</li>
+      <li>Glándulas ecrinas, apocrinas y sebáceas: dónde están, dónde desembocan y para qué sirven.</li>
+      <li>Receptores clásicos: Krause frío, Ruffini calor, Meissner tacto, Pacini presión y vibración.</li>
+      <li>Lesiones primarias frente a secundarias, y erosión frente a úlcera.</li>
+      <li>Orden del aseo: de limpio a sucio y de distal a proximal en las extremidades.</li>
+      <li>Sentidos de limpieza: ojos del ángulo interno al externo; genitales femeninos del pubis al ano.</li>
+      <li>Temperaturas: agua templada y comprobada; la prótesis dental nunca con agua caliente.</li>
+      <li>Límites del TCAE: no diagnostica, no corta las uñas al diabético, no trata lesiones por presión. Observa, registra y comunica.</li>
+      <li>Seguridad: posición lateral en la higiene bucal del paciente inconsciente y volver a colocar el prepucio.</li>
+    </ul>`;
+  $("#results").hidden=false;
+  $("#grade").textContent="Recalcular nota";
+  if(scroll)$("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+render();paintAll();
+</script>
+
+</html>
